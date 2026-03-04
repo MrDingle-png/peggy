@@ -1,3 +1,4 @@
+Will woz 'ere.
 # FanCash Trading Card — Figma board flows and user stories
 
 Source: FanCash Trading Card.pdf (Figma board export)
