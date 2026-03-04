@@ -2,7 +2,9 @@
 
 Product knowledge base for Fanatics Collect — strategy docs, frameworks, and PRDs that define how we build for collectors.
 
-## What's in here
+## Product knowledge
+
+### In this repo
 
 | Folder | What it covers |
 |--------|---------------|
@@ -11,6 +13,17 @@ Product knowledge base for Fanatics Collect — strategy docs, frameworks, and P
 | **Knowledge/Programs & Quests/** | Building blocks shared across Topps programmes and collecting quests |
 | **Knowledge/FanCash Trading Card/** | FanCash trading card proposal, redemption flows, and Figma board references |
 | **Knowledge/Instant Rips/** | Digital packs PRD and review docs |
+
+### Related context on Notion
+
+Additional product context lives in these Notion hubs. They are not yet migrated to this repo but contain relevant strategy and thinking. See [Knowledge/notion-hubs.md](Knowledge/notion-hubs.md) for direct links.
+
+| Hub | What it covers |
+|-----|---------------|
+| **Games & Interactive** | Strategy and thinking around the Fanatics Collect games initiative |
+| **Structural Model** | Fanatics Collect structural model — how product areas relate to each other |
+| **Digital Packs** | Digital Packs initiative — async instant rips, pack mechanics, and distribution |
+| **Dingle Knowledge Hub** | Broader product knowledge hub with cross-cutting strategy and reference material |
 
 ## How to contribute
 
@@ -23,3 +36,5 @@ This repo is the **source of truth** for product knowledge. Changes here are pub
 ```
 Contributors (GitHub) → Peggy repo (source of truth) → Notion (read-only mirror)
 ```
+
+As Notion content is migrated into this repo, the "Related context on Notion" section above will shrink and the "In this repo" section will grow.
