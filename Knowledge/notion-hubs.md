@@ -16,7 +16,4 @@ Links to key Notion hubs. These can be fetched live by the AI assistant using th
 - **URL:** https://www.notion.so/fanaticscollect/Digital-Packs-309d7c400ecf80b5aa41cbdda98e910e
 - **What it contains:** Digital Packs initiative
 
-### Dingle Knowledge Hub
-- **URL:** https://www.notion.so/fanaticscollect/Dingle-Knowledge-Hub-314d7c400ecf809d8e72f735bd8881c2
-- **What it contains:** Dingle's personal knowledge hub
 

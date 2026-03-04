@@ -23,7 +23,6 @@ Additional product context lives in these Notion hubs. They are not yet migrated
 | **Games & Interactive** | Strategy and thinking around the Fanatics Collect games initiative |
 | **Structural Model** | Fanatics Collect structural model — how product areas relate to each other |
 | **Digital Packs** | Digital Packs initiative — async instant rips, pack mechanics, and distribution |
-| **Dingle Knowledge Hub** | Broader product knowledge hub with cross-cutting strategy and reference material |
 
 ## How to contribute
 
