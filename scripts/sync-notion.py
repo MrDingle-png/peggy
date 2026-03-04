@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-Bidirectional sync between local markdown files and Notion Knowledge Hub.
+One-way publish from local markdown files to Notion Knowledge Hub.
+
+Git (Peggy repo) is the source of truth. This script pushes local changes
+to Notion as a read-only mirror. It never pulls from Notion.
 
 Usage:
-    python3 scripts/sync-notion.py              # full sync
+    python3 scripts/sync-notion.py              # publish all changes
     python3 scripts/sync-notion.py --dry-run    # preview without changes
-    python3 scripts/sync-notion.py --status     # show sync status only
+    python3 scripts/sync-notion.py --status     # show what would be published
 """
 
 import argparse
@@ -29,7 +32,7 @@ ENV_PATH = SCRIPT_DIR / ".env"
 NOTION_API_BASE = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
 
-SYNC_DIRS = ["Knowledge", "Tasks"]
+SYNC_DIRS = ["Knowledge"]
 
 
 def load_config():
@@ -66,11 +69,6 @@ def file_hash(filepath):
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 
-def file_mtime_utc(filepath):
-    ts = filepath.stat().st_mtime
-    return datetime.fromtimestamp(ts, tz=timezone.utc)
-
-
 def format_page_id(raw_id):
     """Convert a 32-char hex ID to Notion's 8-4-4-4-12 UUID format."""
     raw = raw_id.replace("-", "")
@@ -94,13 +92,6 @@ def title_from_filename(filename):
 
 
 # --- Notion API helpers ---
-
-def notion_get_page(token, page_id):
-    url = f"{NOTION_API_BASE}/pages/{format_page_id(page_id)}"
-    resp = requests.get(url, headers=notion_headers(token))
-    resp.raise_for_status()
-    return resp.json()
-
 
 def notion_get_blocks(token, block_id):
     """Retrieve all child blocks of a page/block, handling pagination."""
@@ -154,20 +145,7 @@ def notion_create_page(token, parent_id, title, blocks=None):
     return new_id
 
 
-def notion_get_child_pages(token, page_id):
-    """Get child pages of a parent page."""
-    blocks = notion_get_blocks(token, page_id)
-    pages = []
-    for b in blocks:
-        if b["type"] == "child_page":
-            pages.append({
-                "id": b["id"].replace("-", ""),
-                "title": b["child_page"]["title"],
-            })
-    return pages
-
-
-# --- Markdown <-> Notion block conversion ---
+# --- Markdown to Notion block conversion ---
 
 def markdown_to_blocks(md_text):
     """Convert markdown text to Notion API block objects."""
@@ -197,7 +175,7 @@ def markdown_to_blocks(md_text):
             while i < len(lines) and not lines[i].startswith("```"):
                 code_lines.append(lines[i])
                 i += 1
-            i += 1  # skip closing ```
+            i += 1
             blocks.append(code_block("\n".join(code_lines), lang or "plain text"))
         elif line.startswith("- ") or line.startswith("* "):
             blocks.append(bullet_block(line[2:].strip()))
@@ -223,30 +201,30 @@ def rich_text(text):
     """Convert markdown inline formatting to Notion rich_text array."""
     segments = []
     pattern = re.compile(
-        r"(\*\*\*(.+?)\*\*\*)"       # bold+italic
-        r"|(\*\*(.+?)\*\*)"           # bold
-        r"|(\*(.+?)\*)"               # italic
-        r"|(`(.+?)`)"                 # inline code
-        r"|(\[([^\]]+)\]\(([^)]+)\))" # link
+        r"(\*\*\*(.+?)\*\*\*)"
+        r"|(\*\*(.+?)\*\*)"
+        r"|(\*(.+?)\*)"
+        r"|(`(.+?)`)"
+        r"|(\[([^\]]+)\]\(([^)]+)\))"
     )
     pos = 0
     for m in pattern.finditer(text):
         if m.start() > pos:
             segments.append({"type": "text", "text": {"content": text[pos:m.start()]}})
 
-        if m.group(2):  # bold+italic
+        if m.group(2):
             segments.append({"type": "text", "text": {"content": m.group(2)},
                              "annotations": {"bold": True, "italic": True}})
-        elif m.group(4):  # bold
+        elif m.group(4):
             segments.append({"type": "text", "text": {"content": m.group(4)},
                              "annotations": {"bold": True}})
-        elif m.group(6):  # italic
+        elif m.group(6):
             segments.append({"type": "text", "text": {"content": m.group(6)},
                              "annotations": {"italic": True}})
-        elif m.group(8):  # inline code
+        elif m.group(8):
             segments.append({"type": "text", "text": {"content": m.group(8)},
                              "annotations": {"code": True}})
-        elif m.group(10):  # link
+        elif m.group(10):
             segments.append({"type": "text", "text": {"content": m.group(10), "link": {"url": m.group(11)}}})
 
         pos = m.end()
@@ -289,82 +267,7 @@ def divider_block():
     return {"type": "divider", "divider": {}}
 
 
-def blocks_to_markdown(blocks):
-    """Convert Notion API blocks back to markdown text."""
-    lines = []
-    for block in blocks:
-        btype = block["type"]
-        if btype == "heading_1":
-            lines.append(f"# {extract_text(block['heading_1']['rich_text'])}")
-        elif btype == "heading_2":
-            lines.append(f"## {extract_text(block['heading_2']['rich_text'])}")
-        elif btype == "heading_3":
-            lines.append(f"### {extract_text(block['heading_3']['rich_text'])}")
-        elif btype == "paragraph":
-            text = extract_text(block["paragraph"]["rich_text"])
-            lines.append(text if text else "")
-        elif btype == "bulleted_list_item":
-            lines.append(f"- {extract_text(block['bulleted_list_item']['rich_text'])}")
-        elif btype == "numbered_list_item":
-            lines.append(f"1. {extract_text(block['numbered_list_item']['rich_text'])}")
-        elif btype == "quote":
-            lines.append(f"> {extract_text(block['quote']['rich_text'])}")
-        elif btype == "code":
-            lang = block["code"].get("language", "")
-            code_text = extract_text(block["code"]["rich_text"])
-            lines.append(f"```{lang}")
-            lines.append(code_text)
-            lines.append("```")
-        elif btype == "divider":
-            lines.append("---")
-        elif btype == "child_page":
-            pass  # skip child page references
-        elif btype == "toggle":
-            lines.append(f"**{extract_text(block['toggle']['rich_text'])}**")
-        elif btype == "callout":
-            lines.append(f"> {extract_text(block['callout']['rich_text'])}")
-        elif btype == "to_do":
-            checked = block["to_do"].get("checked", False)
-            marker = "[x]" if checked else "[ ]"
-            lines.append(f"- {marker} {extract_text(block['to_do']['rich_text'])}")
-        else:
-            pass  # skip unsupported block types
-
-        lines.append("")
-
-    # Clean up trailing blank lines
-    while lines and not lines[-1].strip():
-        lines.pop()
-
-    return "\n".join(lines) + "\n"
-
-
-def extract_text(rich_text_array):
-    """Convert Notion rich_text array back to markdown-formatted text."""
-    parts = []
-    for seg in rich_text_array:
-        text = seg.get("plain_text", seg.get("text", {}).get("content", ""))
-        ann = seg.get("annotations", {})
-        href = seg.get("href") or seg.get("text", {}).get("link", {})
-        if isinstance(href, dict):
-            href = href.get("url")
-
-        if href:
-            text = f"[{text}]({href})"
-        elif ann.get("code"):
-            text = f"`{text}`"
-        elif ann.get("bold") and ann.get("italic"):
-            text = f"***{text}***"
-        elif ann.get("bold"):
-            text = f"**{text}**"
-        elif ann.get("italic"):
-            text = f"*{text}*"
-
-        parts.append(text)
-    return "".join(parts)
-
-
-# --- Sync logic ---
+# --- Publish logic ---
 
 def find_local_md_files(manifest):
     """Find all .md files in sync directories, excluding skip_files."""
@@ -387,8 +290,6 @@ def find_section_for_file(manifest, local_path):
     if len(parts) >= 2:
         section_key = str(Path(parts[0]) / parts[1])
         return manifest["sections"].get(section_key)
-    elif parts[0] in ("Tasks",):
-        return manifest["sections"].get("Tasks")
     return None
 
 
@@ -400,7 +301,17 @@ def get_file_mapping(manifest, local_path):
     return None
 
 
-def sync_file_to_notion(token, manifest, local_path, dry_run=False):
+def has_local_changes(manifest, local_path):
+    """Check if local file has changed since last publish."""
+    mapping = get_file_mapping(manifest, local_path)
+    filepath = WORKSPACE / local_path
+    current_hash = file_hash(filepath)
+    if not mapping or mapping.get("last_sync_hash") is None:
+        return True
+    return current_hash != mapping["last_sync_hash"]
+
+
+def publish_file_to_notion(token, manifest, local_path, dry_run=False):
     """Push local file content to its Notion page."""
     mapping = get_file_mapping(manifest, local_path)
     filepath = WORKSPACE / local_path
@@ -438,105 +349,12 @@ def sync_file_to_notion(token, manifest, local_path, dry_run=False):
         return "would create", None
 
 
-def sync_notion_to_local(token, manifest, local_path, dry_run=False):
-    """Pull Notion page content to local file."""
-    mapping = get_file_mapping(manifest, local_path)
-    if not mapping or not mapping.get("notion_page_id"):
-        return "skipped (no mapping)"
-
-    page_id = mapping["notion_page_id"]
-    if not dry_run:
-        blocks = notion_get_blocks(token, page_id)
-        md_content = blocks_to_markdown(blocks)
-        filepath = WORKSPACE / local_path
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        filepath.write_text(md_content, encoding="utf-8")
-        mapping["last_sync_hash"] = file_hash(filepath)
-        mapping["last_sync_time"] = datetime.now(timezone.utc).isoformat()
-    return "updated"
-
-
-def discover_new_notion_pages(token, manifest):
-    """Find Notion pages under the hub that aren't mapped to local files."""
-    new_pages = []
-    mapped_ids = {e["notion_page_id"] for e in manifest["files"]}
-
-    for section_dir, section_id in manifest["sections"].items():
-        child_pages = notion_get_child_pages(token, section_id)
-        for page in child_pages:
-            if page["id"] not in mapped_ids:
-                new_pages.append({
-                    "notion_page_id": page["id"],
-                    "title": page["title"],
-                    "section_dir": section_dir,
-                })
-    return new_pages
-
-
-def pull_new_notion_page(token, manifest, page_info, dry_run=False):
-    """Create a local file from a new Notion page."""
-    slug = page_info["title"].lower().replace(" ", "-")
-    slug = re.sub(r"[^a-z0-9\-]", "", slug)
-    slug = re.sub(r"-+", "-", slug).strip("-")
-    local_path = f"{page_info['section_dir']}/{slug}.md"
-
-    filepath = WORKSPACE / local_path
-    if filepath.exists():
-        return local_path, "skipped (file exists)"
-
-    if not dry_run:
-        blocks = notion_get_blocks(token, page_info["notion_page_id"])
-        md_content = blocks_to_markdown(blocks)
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        filepath.write_text(md_content, encoding="utf-8")
-        manifest["files"].append({
-            "local_path": local_path,
-            "notion_page_id": page_info["notion_page_id"],
-            "last_sync_hash": file_hash(filepath),
-            "last_sync_time": datetime.now(timezone.utc).isoformat(),
-        })
-    return local_path, "created"
-
-
-def determine_sync_direction(token, manifest, local_path):
-    """Decide whether to push local→Notion or pull Notion→local."""
-    mapping = get_file_mapping(manifest, local_path)
-    filepath = WORKSPACE / local_path
-
-    if not mapping or not mapping.get("notion_page_id"):
-        return "push"
-
-    current_hash = file_hash(filepath)
-    local_changed = mapping.get("last_sync_hash") is None or current_hash != mapping["last_sync_hash"]
-
-    try:
-        page = notion_get_page(token, mapping["notion_page_id"])
-        notion_edited = datetime.fromisoformat(page["last_edited_time"].replace("Z", "+00:00"))
-    except requests.HTTPError:
-        return "push" if local_changed else "skip"
-
-    if mapping.get("last_sync_time"):
-        last_sync = datetime.fromisoformat(mapping["last_sync_time"])
-        notion_changed = notion_edited > last_sync
-    else:
-        notion_changed = True
-
-    if local_changed and notion_changed:
-        local_mtime = file_mtime_utc(filepath)
-        return "push" if local_mtime > notion_edited else "pull"
-    elif local_changed:
-        return "push"
-    elif notion_changed:
-        return "pull"
-    return "skip"
-
-
-def run_sync(dry_run=False, status_only=False):
+def run_publish(dry_run=False, status_only=False):
     token = load_config()
     manifest = load_manifest()
     actions = []
 
-    print(f"{'[DRY RUN] ' if dry_run else ''}Syncing with Notion Knowledge Hub...")
+    print(f"{'[DRY RUN] ' if dry_run else ''}Publishing to Notion Knowledge Hub...")
     print(f"Hub: {manifest['notion_hub_id']}")
     print()
 
@@ -546,43 +364,32 @@ def run_sync(dry_run=False, status_only=False):
     existing = [f for f in local_files if f in mapped_paths]
 
     for local_path in existing:
-        direction = determine_sync_direction(token, manifest, local_path)
+        changed = has_local_changes(manifest, local_path)
+
         if status_only:
-            status_label = {"push": "local newer", "pull": "Notion newer", "skip": "in sync"}
-            print(f"  {status_label.get(direction, direction):>14}  {local_path}")
+            label = "changed" if changed else "up to date"
+            print(f"  {label:>14}  {local_path}")
             continue
 
-        if direction == "push":
-            result, page_id = sync_file_to_notion(token, manifest, local_path, dry_run)
+        if changed:
+            result, page_id = publish_file_to_notion(token, manifest, local_path, dry_run)
             actions.append(f"  → Notion  {local_path}  ({result})")
             print(f"  → Notion  {local_path}")
-        elif direction == "pull":
-            result = sync_notion_to_local(token, manifest, local_path, dry_run)
-            actions.append(f"  ← Notion  {local_path}  ({result})")
-            print(f"  ← Notion  {local_path}")
         else:
-            print(f"  ✓ in sync  {local_path}")
+            print(f"  ✓ up to date  {local_path}")
 
         time.sleep(0.15)
 
     if status_only:
         for f in new_local:
-            print(f"  {'new local':>14}  {f}")
-        print(f"\n{len(existing)} mapped | {len(new_local)} new local")
+            print(f"  {'new':>14}  {f}")
+        print(f"\n{len(existing)} mapped | {len(new_local)} new")
         return
 
     for local_path in new_local:
-        result, page_id = sync_file_to_notion(token, manifest, local_path, dry_run)
+        result, page_id = publish_file_to_notion(token, manifest, local_path, dry_run)
         actions.append(f"  + Notion  {local_path}  ({result})")
         print(f"  + Notion  {local_path}  ({result})")
-        time.sleep(0.15)
-
-    print("\nChecking for new Notion pages...")
-    new_notion_pages = discover_new_notion_pages(token, manifest)
-    for page_info in new_notion_pages:
-        local_path, result = pull_new_notion_page(token, manifest, page_info, dry_run)
-        actions.append(f"  + Local   {local_path}  ({result})")
-        print(f"  + Local   {local_path}  ({result})")
         time.sleep(0.15)
 
     if not dry_run:
@@ -590,18 +397,16 @@ def run_sync(dry_run=False, status_only=False):
 
     print(f"\n--- Summary ---")
     print(f"Files checked: {len(existing) + len(new_local)}")
-    print(f"Actions taken: {len(actions)}")
-    if new_notion_pages:
-        print(f"New from Notion: {len(new_notion_pages)}")
+    print(f"Published: {len(actions)}")
     for a in actions:
         print(a)
     print()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sync local markdown files with Notion Knowledge Hub")
-    parser.add_argument("--dry-run", action="store_true", help="Preview changes without syncing")
-    parser.add_argument("--status", action="store_true", help="Show sync status only")
+    parser = argparse.ArgumentParser(description="Publish local markdown files to Notion Knowledge Hub (one-way)")
+    parser.add_argument("--dry-run", action="store_true", help="Preview changes without publishing")
+    parser.add_argument("--status", action="store_true", help="Show publish status only")
     args = parser.parse_args()
 
     if not MANIFEST_PATH.exists():
@@ -609,9 +414,9 @@ def main():
         sys.exit(1)
 
     if args.status:
-        run_sync(status_only=True)
+        run_publish(status_only=True)
     else:
-        run_sync(dry_run=args.dry_run)
+        run_publish(dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

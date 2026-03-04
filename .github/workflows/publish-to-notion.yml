@@ -1,0 +1,45 @@
+name: Publish to Notion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Knowledge/**'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Restore sync manifest
+        env:
+          SYNC_MANIFEST: ${{ secrets.SYNC_MANIFEST }}
+        run: |
+          if [ -n "$SYNC_MANIFEST" ]; then
+            echo "$SYNC_MANIFEST" > scripts/.sync-manifest.json
+          else
+            echo "WARNING: No SYNC_MANIFEST secret set. Skipping publish."
+            exit 0
+          fi
+
+      - name: Publish to Notion
+        env:
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+        run: python3 scripts/sync-notion.py
+
+      - name: Save updated manifest
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Manifest updated. To keep sync state, update the SYNC_MANIFEST secret"
+          echo "with the contents of scripts/.sync-manifest.json after each run."
+          cat scripts/.sync-manifest.json
