@@ -1,0 +1,11 @@
+# Secrets
+scripts/.env
+
+# Local sync state
+scripts/.sync-manifest.json
+
+# IDE config
+.cursor/
+
+# OS files
+.DS_Store
