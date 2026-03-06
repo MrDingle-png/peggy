@@ -13,6 +13,10 @@ Product knowledge base for Fanatics Collect — strategy docs, frameworks, and P
 | **Knowledge/Programs & Quests/** | Building blocks shared across Topps programmes and collecting quests |
 | **Knowledge/FanCash Trading Card/** | FanCash trading card proposal, redemption flows, and Figma board references |
 | **Knowledge/Instant Rips/** | Digital packs PRD and review docs |
+| **Knowledge/Established Product Behaviour/** | How key product systems behave today — extended bidding, item submission, valuation |
+| **Knowledge/Experience Framework/** | Holistic UX frameworks connecting Collect, Vault, and Live — starting with Collections |
+| **Knowledge/System Architecture/** | Data models, services, and integration patterns — folders/tags, unvaulted items |
+| **Knowledge/Reference Taxonomy/** | Shared language and classification — detail page taxonomy, glossary, cross-reference index |
 
 ### Related context on Notion
 
