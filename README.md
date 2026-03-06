@@ -41,3 +41,17 @@ Contributors (GitHub) → Peggy repo (source of truth) → Notion (read-only mir
 ```
 
 As Notion content is migrated into this repo, the "Related context on Notion" section above will shrink and the "In this repo" section will grow.
+
+## Publishing to Notion
+
+After committing changes to `Knowledge/` files, publish them to Notion using the AI assistant:
+
+1. **Tell the assistant** to publish changes to Notion — it uses the Notion MCP integration to push content directly.
+2. The assistant reads the local markdown files, converts them to Notion-flavored format, and updates each mapped Notion page.
+3. Page mappings (local path → Notion page ID) are stored in `scripts/.sync-manifest.json`.
+
+**When adding a new document:**
+- Create the markdown file under the appropriate `Knowledge/` folder.
+- Add a file entry to `scripts/.sync-manifest.json` with the `local_path` and `notion_page_id`.
+- If the document belongs to a new folder, also add a section entry mapping the folder to its Notion parent page ID.
+- Ask the assistant to publish it.
