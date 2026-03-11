@@ -609,22 +609,28 @@
 
   /* Shop Home */
   .shop-home-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
     margin-bottom: 20px;
+    padding-bottom: 4px;
   }
+  .shop-home-grid::-webkit-scrollbar { display: none; }
   .shop-entry {
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 16px 14px;
+    padding: 14px 12px;
     cursor: pointer;
     transition: all 0.15s;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+    min-width: 100px;
+    flex-shrink: 0;
   }
   .shop-entry:hover { border-color: var(--accent-border); }
   .shop-entry .entry-icon {
@@ -813,6 +819,80 @@
   .pill-filter-icon:hover { border-color: var(--accent-border); }
   .pill-filter-icon svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
 
+  /* Watchlist banner on Shop Home */
+  .watchlist-banner {
+    background: var(--surface-2);
+    border: 1px solid var(--amber);
+    border-left: 3px solid var(--amber);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .watchlist-banner:hover { border-color: var(--rose); }
+  .watchlist-banner .banner-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .watchlist-banner .banner-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .watchlist-banner .banner-countdown {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--amber);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+  .watchlist-banner .banner-summary {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    flex-shrink: 0;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Auction status bar in watchlist vertical */
+  .auction-status {
+    background: var(--surface-2);
+    border: 1px solid var(--amber);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .auction-status .status-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .auction-status .status-window {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .auction-status .status-timer {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--amber);
+    font-variant-numeric: tabular-nums;
+  }
+
   .shop-vertical { display: none; }
   .shop-vertical.active { display: block; }
 
@@ -909,6 +989,16 @@
 
         <!-- Shop Home -->
         <div id="shop-home">
+          <!-- Watchlist banner — visible when collector has active bids/watchlist items -->
+          <div class="watchlist-banner" onclick="shopVertical('watchlist')">
+            <div class="banner-header">
+              <div class="pulse-dot"></div>
+              <div class="banner-title">Watchlist &amp; Bids</div>
+              <div class="banner-countdown">4:32</div>
+            </div>
+            <div class="banner-summary">3 active bids · 2 need bids · 1 extended · 12 watching</div>
+          </div>
+
           <div class="shop-home-grid">
             <div class="shop-entry" onclick="shopVertical('cards')">
               <div class="entry-icon" style="background:var(--accent-soft)">
@@ -928,8 +1018,8 @@
               <div class="entry-icon" style="background:var(--cyan-soft)">
                 <svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
-              <div class="entry-label">Drops</div>
-              <div class="entry-sub">Exclusives & releases</div>
+              <div class="entry-label">Topps</div>
+              <div class="entry-sub">Releases & exclusives</div>
             </div>
             <div class="shop-entry" onclick="shopVertical('live')">
               <div class="entry-icon" style="background:var(--rose-soft)">
@@ -1287,40 +1377,40 @@
           <div class="listing-card">
             <div class="listing-thumb"></div>
             <div class="listing-info">
-              <div class="listing-title">2024 Prizm Hobby Box</div>
-              <div class="listing-meta">Panini Prizm · Basketball · Hobby</div>
+              <div class="listing-title">Digital Packs — Series 3</div>
+              <div class="listing-meta">Fanatics Exclusive · Multi-sport</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="listing-price">$389</div>
-                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+                <div class="listing-price">$14.99</div>
+                <span class="listing-badge" style="background:var(--cyan-soft);color:var(--cyan)">Drop</span>
+                <span style="font-size:10px;color:var(--text-dim)">Fri 12pm ET</span>
               </div>
             </div>
           </div>
           <div class="listing-card">
             <div class="listing-thumb"></div>
             <div class="listing-info">
-              <div class="listing-title">2024 Topps Chrome Hobby</div>
-              <div class="listing-meta">Topps Chrome · Baseball · Hobby</div>
+              <div class="listing-title">Exclusive Chrome Parallels</div>
+              <div class="listing-meta">Limited to 500 · Instant rip</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="listing-price">$275</div>
-                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+                <div class="listing-price">$29.99</div>
+                <span class="listing-badge" style="background:var(--cyan-soft);color:var(--cyan)">Drop</span>
               </div>
             </div>
           </div>
           <div class="listing-card">
             <div class="listing-thumb"></div>
             <div class="listing-info">
-              <div class="listing-title">2024 Bowman Draft Jumbo</div>
-              <div class="listing-meta">Bowman Draft · Baseball · Jumbo</div>
+              <div class="listing-title">2025 Topps Series 1 Early Access</div>
+              <div class="listing-meta">Baseball · Hobby box</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="listing-price">$195</div>
-                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Weekly</span>
-                <span style="font-size:10px;color:var(--text-dim)">1d 4h left</span>
+                <div class="listing-price">$89.99</div>
+                <span class="listing-badge" style="background:var(--green-soft);color:var(--green)">New</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Drops vertical -->
+        <!-- Topps vertical -->
         <div class="shop-vertical" id="shop-drops">
           <div class="icon-tabs">
             <div class="icon-tab active" onclick="selectIconTab(this)">
@@ -1389,34 +1479,34 @@
           <div class="listing-card">
             <div class="listing-thumb"></div>
             <div class="listing-info">
-              <div class="listing-title">Digital Packs — Series 3</div>
-              <div class="listing-meta">Fanatics Exclusive · Multi-sport</div>
+              <div class="listing-title">2024 Prizm Hobby Box</div>
+              <div class="listing-meta">Panini Prizm · Basketball · Hobby</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="listing-price">$14.99</div>
-                <span class="listing-badge" style="background:var(--cyan-soft);color:var(--cyan)">Drop</span>
-                <span style="font-size:10px;color:var(--text-dim)">Fri 12pm ET</span>
+                <div class="listing-price">$389</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
               </div>
             </div>
           </div>
           <div class="listing-card">
             <div class="listing-thumb"></div>
             <div class="listing-info">
-              <div class="listing-title">Exclusive Chrome Parallels</div>
-              <div class="listing-meta">Limited to 500 · Instant rip</div>
+              <div class="listing-title">2024 Topps Chrome Hobby</div>
+              <div class="listing-meta">Topps Chrome · Baseball · Hobby</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="listing-price">$29.99</div>
-                <span class="listing-badge" style="background:var(--cyan-soft);color:var(--cyan)">Drop</span>
+                <div class="listing-price">$275</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
               </div>
             </div>
           </div>
           <div class="listing-card">
             <div class="listing-thumb"></div>
             <div class="listing-info">
-              <div class="listing-title">2025 Topps Series 1 Early Access</div>
-              <div class="listing-meta">Baseball · Hobby box</div>
+              <div class="listing-title">2024 Bowman Draft Jumbo</div>
+              <div class="listing-meta">Bowman Draft · Baseball · Jumbo</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="listing-price">$89.99</div>
-                <span class="listing-badge" style="background:var(--green-soft);color:var(--green)">New</span>
+                <div class="listing-price">$195</div>
+                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Weekly</span>
+                <span style="font-size:10px;color:var(--text-dim)">1d 4h left</span>
               </div>
             </div>
           </div>
@@ -1518,6 +1608,80 @@
                 <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Upcoming</span>
                 <span style="font-size:10px;color:var(--text-dim)">Sun 7pm ET</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Watchlist vertical (unified bid tracking) -->
+        <div class="shop-vertical" id="shop-watchlist">
+          <div class="auction-status">
+            <div>
+              <div class="status-label">Weekly Auction · Extended Bidding</div>
+              <div class="status-window">Window 3 of 8 · 5 min windows</div>
+            </div>
+            <div class="status-timer">4:32</div>
+          </div>
+
+          <div class="pill-filters">
+            <div class="pill-filter-icon" title="All filters">
+              <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </div>
+            <div class="pill-filter active" onclick="this.parentElement.querySelectorAll('.pill-filter').forEach(p=>p.classList.remove('active'));this.classList.add('active')">All Items</div>
+            <div class="pill-filter" onclick="this.parentElement.querySelectorAll('.pill-filter').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Bid Needed</div>
+            <div class="pill-filter" onclick="this.parentElement.querySelectorAll('.pill-filter').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Extended</div>
+            <div class="pill-filter" onclick="this.parentElement.querySelectorAll('.pill-filter').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Winning</div>
+            <div class="pill-filter" onclick="this.parentElement.querySelectorAll('.pill-filter').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Outbid</div>
+          </div>
+
+          <div class="listing-card" style="border-left:3px solid var(--amber)">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Prizm Silver Anthony Edwards</div>
+              <div class="listing-meta">Raw · Panini Prizm · Basketball · Cards</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$89</div>
+                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Bid Needed</span>
+              </div>
+              <div style="font-size:11px;color:var(--amber);margin-top:4px">No bids this window · Closes if unbid</div>
+            </div>
+          </div>
+
+          <div class="listing-card" style="border-left:3px solid var(--green)">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2023 Topps Chrome #1 Wembanyama RC</div>
+              <div class="listing-meta">PSA 10 · Topps Chrome · Basketball · Cards</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$1,245</div>
+                <span class="listing-badge" style="background:var(--green-soft);color:var(--green)">Extended</span>
+              </div>
+              <div style="font-size:11px;color:var(--green);margin-top:4px">Bid received · Moving to next window</div>
+            </div>
+          </div>
+
+          <div class="listing-card" style="border-left:3px solid var(--accent)">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Bowman Draft Jumbo Box</div>
+              <div class="listing-meta">Bowman Draft · Baseball · Packs</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$195</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Winning</span>
+              </div>
+              <div style="font-size:11px;color:var(--accent);margin-top:4px">You're the highest bidder</div>
+            </div>
+          </div>
+
+          <div class="listing-card" style="border-left:3px solid var(--rose)">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2022 Bowman Chrome Auto Holman</div>
+              <div class="listing-meta">BGS 9.5 · Bowman Chrome · Basketball · Cards</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$342</div>
+                <span class="listing-badge" style="background:var(--rose-soft);color:var(--rose)">Outbid</span>
+              </div>
+              <div style="font-size:11px;color:var(--rose);margin-top:4px">Someone bid higher · Bid again to win</div>
             </div>
           </div>
         </div>
@@ -1702,7 +1866,7 @@
           <div class="migration-arrow">
             <span class="from-label">Bids</span>
             <span class="arrow">→</span>
-            <span class="to-label">Shop → Watchlist</span>
+            <span class="to-label">Shop → Watchlist & Bids</span>
           </div>
         </div>
       </div>
@@ -1744,6 +1908,27 @@
       </div>
 
       <div id="inbox-feed">
+        <!-- Bid alerts -->
+        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--rose)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--rose)">Bid Alert</span>
+            <span style="font-size:10px;color:var(--text-dim)">12m ago</span>
+          </div>
+          <div class="card-title">Outbid — Wembanyama RC</div>
+          <div class="card-desc">Someone placed a higher bid on your PSA 10 Topps Chrome. Current: $1,280</div>
+          <div style="font-size:11px;color:var(--rose);margin-top:4px">Tap to re-bid · Extended bidding active</div>
+        </div>
+
+        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--amber)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--amber)">Auction</span>
+            <span style="font-size:10px;color:var(--text-dim)">28m ago</span>
+          </div>
+          <div class="card-title">Extended bidding starts in 30 min</div>
+          <div class="card-desc">Weekly Auction — you have 3 active bids across 4 watched items</div>
+          <div style="font-size:11px;color:var(--amber);margin-top:4px">Tap to review your bids</div>
+        </div>
+
         <!-- Alert items -->
         <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--amber)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -1882,6 +2067,7 @@
               </span>
             </div>
             <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Payments, state changes, vault ops. Cleared when resolved.</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Bid alerts: outbid, extended bidding starting, auction closing</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-note">Thread view enters focused mode</span></div>
           </div>
         </div>
@@ -1915,21 +2101,21 @@
           <div class="tree-heading" style="cursor:pointer" onclick="switchTab('shop')">Shop <span class="tree-note" style="font-weight:400">— Discovery & Commerce</span></div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Shop Home (default landing)</span></div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Entry point grid + recommendation carousels</span></div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Cards / Packs / Releases / Live Now</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Watchlist banner + entry carousel + recommendation carousels</span></div>
             <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">"View All" → dedicated vertical surface</span></div>
-            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Dedicated Verticals</span></div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Cards / Packs / Drops / Live</span></div>
-            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Browse Filters (within each vertical)</span></div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Filter · Watchlist · Format · Category pills</span></div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Single scrollable row</span></div>
             <div class="tree-item"><span class="tree-line">·</span>
               <span class="tree-label" style="display:flex;align-items:center;gap:6px">
-                Watchlist
-                <span class="migration-badge to" style="font-size:9px">← Saved/Bids</span>
+                Watchlist & Bids
+                <span class="migration-badge to" style="font-size:9px">← Account Bids</span>
               </span>
             </div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Inline filter for saved items & bid activity</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Surfaces on Shop Home when items present</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Urgency treatment during extended bidding</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Unified view: bid status, countdowns, cross-category</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Dedicated Verticals</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Cards / Packs / Topps / Live</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Browse Filters (within each vertical)</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Filter · Watchlist · Format · Category pills</span></div>
           </div>
         </div>
         <div class="tree-group">
@@ -2002,9 +2188,9 @@
     if (name === 'shop') shopHome();
   }
 
-  const verticals = ['cards', 'packs', 'drops', 'live'];
+  const verticals = ['cards', 'packs', 'drops', 'live', 'watchlist'];
 
-  const verticalTitles = { cards: 'Cards', packs: 'Packs', drops: 'Drops', live: 'Live' };
+  const verticalTitles = { cards: 'Cards', packs: 'Packs', drops: 'Topps', live: 'Live', watchlist: 'Watchlist & Bids' };
 
   function shopVertical(name) {
     document.getElementById('shop-home').style.display = 'none';

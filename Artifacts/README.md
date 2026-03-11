@@ -14,7 +14,7 @@ The wireframe models the ownership-first platform structure with five primary pi
 
 **Primary pillars (tab bar):**
 - **Home** — orchestration layer with priority tasks, portfolio highlights, and entry points
-- **Shop** — curated home page with entry point grid and recommendation carousels, plus dedicated vertical surfaces (Cards, Packs, Drops, Live)
+- **Shop** — curated home page with entry point grid and recommendation carousels, plus dedicated vertical surfaces (Cards, Packs, Topps, Live)
 - **Search** — intent-driven finding across marketplace listings, entity hubs, and canonical catalogue records
 - **Collection** — ownership space with All Items, Stacks, Quests, Programs, and Want List
 - **Account** — operations and identity (Orders, Selling, Vault Activity, Wallet, Preferences)
@@ -24,20 +24,24 @@ The wireframe models the ownership-first platform structure with five primary pi
 - **Inbox** — unified communication hub with filterable feed (Messages, Offers, Alerts)
 
 **Shop detail:**
-- Shop Home lands on a curated page with a 2x2 entry grid and recommendation carousels (Recommended Cards, Recommended Packs, Latest Release, Live Now)
-- Each vertical (Cards, Packs, Drops, Live) is a dedicated browsing surface with icon+label category tabs (For You, Basketball, Football, Baseball, Soccer, Hockey, UFC) and pill filters (Filter, Watchlist, Format, Grade, Price)
+- Shop Home lands on a curated page with a Watchlist banner (when items present), a horizontal entry carousel (Cards, Packs, Topps, Live), and recommendation carousels (Recommended Cards, Recommended Packs, Latest Release, Live Now)
+- Watchlist & Bids is a dedicated vertical surface accessible from Shop Home, showing all active bids and watched items in a unified cross-category view with bid status badges (Bid Needed, Extended, Winning, Outbid) and auction countdown timers
+- During extended bidding, the Watchlist banner shows urgency treatment: pulsing dot, countdown timer, and bid status summary
+- Each vertical (Cards, Packs, Topps, Live) is a dedicated browsing surface with icon+label category tabs (For You, Basketball, Football, Baseball, Soccer, Hockey, UFC) and pill filters (Filter, Watchlist, Format, Grade, Price)
 - Header updates with back navigation when inside a vertical
 
 ### Key architectural decisions demonstrated
 
-- Bids migrated from Account to Shop Watchlist (inline filter within each vertical)
+- Bids managed in Shop via Watchlist & Bids surface (promoted on Shop Home, dedicated vertical for tracking)
+- Bid status alerts (outbid, extended bidding starting) surface in Inbox as Alerts, driving collectors back to the bid tracker
 - Offers migrated from Account to Inbox (as negotiation threads)
 - Notifications and Messaging unified into a single Inbox with filter chips
 - Shop restructured from Discover/Saved mode toggle to curated home + dedicated verticals with icon category tabs
+- Shop Home entry points converted from 2x2 grid to horizontal carousel to save vertical space
 
 ### How to use
 
-Open `structural-model-wireframe.html` in any browser. Tap the tab bar to switch pillars, tap header icons for Cart and Inbox overlays, and navigate through Shop Home into dedicated verticals.
+Open `structural-model-wireframe.html` in any browser. Tap the tab bar to switch pillars, tap header icons for Cart and Inbox overlays, and navigate through Shop Home into dedicated verticals. On Shop Home, tap the Watchlist & Bids banner to enter the unified bid tracking surface with extended bidding status and countdown.
 
 ---
 
