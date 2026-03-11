@@ -38,3 +38,42 @@ The wireframe models the ownership-first platform structure with five primary pi
 ### How to use
 
 Open `structural-model-wireframe.html` in any browser. Tap the tab bar to switch pillars, tap header icons for Cart and Inbox overlays, and navigate through Shop Home into dedicated verticals.
+
+---
+
+## Related Knowledge Base context
+
+When working on or extending this wireframe, load these Knowledge documents for domain context:
+
+### Essential — Architecture & IA
+
+| Document | Path | Why it matters |
+|---|---|---|
+| **Structural Model (Notion)** | `Knowledge/notion-hubs.md` → Structural Model URL | The canonical Notion doc this wireframe is based on. Fetch live via the Notion MCP for the latest version. |
+| **App Architecture Schematic** | `Knowledge/Games & Interactive/collect-app-architecture-schematic.md` | Mermaid diagrams of the three-layer architecture (pillars, global utilities, focused modes) — the same model the wireframe implements. |
+| **Structural Model Proposed Changes** | `Knowledge/Games & Interactive/structural-model-proposed-changes.md` | Pending additions (Activities, Rewards Hub) that will affect future wireframe iterations. |
+
+### Important — Collection & Ownership
+
+| Document | Path | Why it matters |
+|---|---|---|
+| **Collections Framework** | `Knowledge/Experience Framework/collections.md` | Defines how ownership, organization, and value tracking work — the Collection pillar's foundation. |
+| **Folders, Tags & Collection Lists** | `Knowledge/System Architecture/folders-tags-and-collection-lists.md` | Data architecture behind Stacks, folders, and how items are organized — critical for the Collection pillar. |
+| **Unvaulted Items Data Architecture** | `Knowledge/System Architecture/unvaulted-items-data-architecture.md` | How unvaulted items are modelled — affects what shows up in Collection. |
+
+### Important — Commerce & Marketplace
+
+| Document | Path | Why it matters |
+|---|---|---|
+| **Detail Page Taxonomy** | `Knowledge/Reference Taxonomy/detail-page-taxonomy.md` | Defines the types of detail pages (listing, OIP, catalogue) that Shop verticals link to. |
+| **Extended Bidding** | `Knowledge/Established Product Behaviour/extended-bidding.md` | How auctions work — relevant to the Weekly/Premier Auction formats in Shop filters. |
+| **Item Submission** | `Knowledge/Established Product Behaviour/item-submission.md` | How items enter the vault — connects to the Account pillar's selling flow. |
+| **Collections Glossary** | `Knowledge/Reference Taxonomy/collections-glossary.md` | Shared vocabulary across product, design, and engineering. |
+
+### Useful — Programs & Engagement
+
+| Document | Path | Why it matters |
+|---|---|---|
+| **Collector Quests Strategy** | `Knowledge/Quests/collector-quests-strategy-v5.md` | Quest framework and collector archetypes — Quests live in the Collection pillar. |
+| **Games & Quests Strategy Brief** | `Knowledge/Games & Interactive/games-quests-programmes-strategy-brief.md` | How games, quests, and programmes fit into the structural model. |
+| **Programs vs Quests Building Blocks** | `Knowledge/Programs & Quests/programs-vs-quests-building-blocks.md` | Distinction between programs and quests — both are Collection sub-sections. |
