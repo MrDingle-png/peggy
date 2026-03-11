@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fanatics Collect — Structural Model Wireframe</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface-2: #242836;
+    --surface-3: #2e3345;
+    --border: #353a4a;
+    --text: #e8eaf0;
+    --text-muted: #8b90a0;
+    --text-dim: #5c6175;
+    --accent: #6c7cff;
+    --accent-soft: rgba(108, 124, 255, 0.12);
+    --accent-border: rgba(108, 124, 255, 0.3);
+    --green: #34d399;
+    --green-soft: rgba(52, 211, 153, 0.12);
+    --amber: #fbbf24;
+    --amber-soft: rgba(251, 191, 36, 0.12);
+    --rose: #fb7185;
+    --rose-soft: rgba(251, 113, 133, 0.12);
+    --cyan: #22d3ee;
+    --cyan-soft: rgba(34, 211, 238, 0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --phone-width: 393px;
+    --phone-height: 852px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 680px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .layout {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    max-width: 1200px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Phone Frame */
+  .phone {
+    width: var(--phone-width);
+    min-width: var(--phone-width);
+    height: var(--phone-height);
+    background: var(--surface);
+    border-radius: 40px;
+    border: 3px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .dynamic-island {
+    width: 126px;
+    height: 36px;
+    background: #000;
+    border-radius: 20px;
+  }
+
+  /* Header */
+  .app-header {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .app-header .title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .header-icons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .header-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .header-icon:hover { background: var(--surface-3); }
+  .header-icon svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
+  .header-icon.active svg { stroke: var(--accent); }
+  .header-icon .badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--rose);
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+  }
+
+  /* Content area */
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 20px;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* Tab bar */
+  .tab-bar {
+    height: 82px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding-top: 8px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s;
+  }
+  .tab:hover { background: var(--surface-2); }
+  .tab svg { width: 24px; height: 24px; stroke: var(--text-dim); fill: none; stroke-width: 1.8; transition: stroke 0.15s; }
+  .tab span { font-size: 10px; color: var(--text-dim); font-weight: 500; transition: color 0.15s; }
+  .tab.active svg { stroke: var(--accent); }
+  .tab.active span { color: var(--accent); }
+
+  /* Screen sections */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .wire-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    cursor: default;
+    transition: border-color 0.15s;
+  }
+  .wire-card:hover { border-color: var(--accent-border); }
+  .wire-card .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .wire-card .card-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .wire-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+    transition: border-color 0.15s;
+  }
+  .wire-row:hover { border-color: var(--accent-border); }
+  .wire-row .row-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .wire-row .row-icon svg { width: 18px; height: 18px; stroke-width: 1.8; fill: none; }
+  .wire-row .row-text { flex: 1; }
+  .wire-row .row-title { font-size: 14px; font-weight: 500; }
+  .wire-row .row-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .chip-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface-3);
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip:hover { border-color: var(--accent-border); color: var(--text); }
+  .chip.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+
+  .migration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .migration-badge.from { background: var(--rose-soft); color: var(--rose); }
+  .migration-badge.to { background: var(--green-soft); color: var(--green); }
+
+  .placeholder-block {
+    height: 80px;
+    border-radius: var(--radius);
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--surface-2),
+      var(--surface-2) 8px,
+      var(--surface-3) 8px,
+      var(--surface-3) 16px
+    );
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+
+  .mode-toggle {
+    display: flex;
+    background: var(--surface-3);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 16px;
+  }
+  .mode-toggle .mode-btn {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mode-toggle .mode-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .search-bar {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .search-bar svg { width: 18px; height: 18px; stroke: var(--text-dim); fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .search-bar span { font-size: 14px; color: var(--text-dim); }
+
+  .priority-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .priority-card .card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .priority-card .card-desc { font-size: 12px; color: var(--text-muted); }
+
+  /* Side Panel */
+  .side-panel {
+    flex: 1;
+    max-width: 480px;
+    min-width: 320px;
+  }
+
+  .panel-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .panel-block h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-block h3 .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tree { padding-left: 0; }
+  .tree-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .tree-item .tree-line {
+    color: var(--text-dim);
+    font-family: monospace;
+    flex-shrink: 0;
+    width: 20px;
+    text-align: right;
+  }
+  .tree-item .tree-label { color: var(--text); }
+  .tree-item .tree-note { color: var(--text-muted); font-size: 12px; }
+
+  .tree-group {
+    margin-bottom: 4px;
+  }
+  .tree-group .tree-heading {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tree-children {
+    padding-left: 24px;
+    border-left: 1px solid var(--border);
+    margin-left: 4px;
+  }
+
+  .migration-callout {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-top: 8px;
+  }
+  .migration-callout .callout-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .migration-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 4px 0;
+  }
+  .migration-arrow .arrow { color: var(--text-dim); }
+  .migration-arrow .from-label { color: var(--rose); }
+  .migration-arrow .to-label { color: var(--green); }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .overlay-panel {
+    display: none;
+    position: absolute;
+    top: 106px;
+    left: 0;
+    right: 0;
+    bottom: 82px;
+    background: rgba(15, 17, 23, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .overlay-panel.active { display: block; }
+  .overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 11;
+  }
+  .overlay-close svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 2; }
+  .overlay-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-bottom: 12px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  .filter-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: var(--surface-3);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--accent-border); color: var(--text); }
+  .filter-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .filter-btn.watchlist-active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent-border);
+  }
+
+  .dropdown-chip {
+    position: relative;
+  }
+  .dropdown-chip .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    min-width: 160px;
+    z-index: 20;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .dropdown-chip .dropdown-menu.open { display: block; }
+  .dropdown-chip .dropdown-option {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .dropdown-chip .dropdown-option:hover { background: var(--surface-3); color: var(--text); }
+  .dropdown-chip .dropdown-option.selected { color: var(--accent); }
+
+  .category-chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .category-chip:hover { border-color: var(--accent-border); color: var(--text); }
+  .category-chip.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+
+  .listing-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: border-color 0.15s;
+  }
+  .listing-card:hover { border-color: var(--accent-border); }
+  .listing-thumb {
+    width: 64px;
+    height: 88px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-3);
+    flex-shrink: 0;
+  }
+  .listing-info { flex: 1; }
+  .listing-info .listing-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .listing-info .listing-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .listing-info .listing-price { font-size: 14px; font-weight: 600; color: var(--green); }
+  .listing-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* Shop Home */
+  .shop-home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .shop-entry {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .shop-entry:hover { border-color: var(--accent-border); }
+  .shop-entry .entry-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .shop-entry .entry-icon svg { width: 18px; height: 18px; fill: none; stroke-width: 1.8; }
+  .shop-entry .entry-label { font-size: 14px; font-weight: 600; }
+  .shop-entry .entry-sub { font-size: 11px; color: var(--text-muted); }
+
+  .carousel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .carousel-header:first-child { margin-top: 0; }
+  .carousel-header .carousel-title { font-size: 15px; font-weight: 600; }
+  .carousel-header .view-all {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .carousel-header .view-all:hover { background: var(--accent-soft); }
+
+  .carousel-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel-row::-webkit-scrollbar { display: none; }
+
+  .carousel-card {
+    flex-shrink: 0;
+    width: 130px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .carousel-card:hover { border-color: var(--accent-border); }
+  .carousel-card .card-thumb {
+    width: 100%;
+    height: 100px;
+    background: var(--surface-3);
+  }
+  .carousel-card .card-body { padding: 8px 10px; }
+  .carousel-card .card-body .card-name { font-size: 12px; font-weight: 600; line-height: 1.3; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .carousel-card .card-body .card-price { font-size: 12px; font-weight: 600; color: var(--green); }
+  .carousel-card .card-body .card-info { font-size: 10px; color: var(--text-muted); }
+
+  .carousel-card.live-card .card-thumb {
+    position: relative;
+  }
+  .live-badge-sm {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: var(--rose);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Icon category tabs (Fanatics Live style) */
+  .icon-tabs {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 14px;
+    padding-bottom: 2px;
+  }
+  .icon-tabs::-webkit-scrollbar { display: none; }
+
+  .icon-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-width: 60px;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .icon-tab .tab-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    border: 2px solid transparent;
+  }
+  .icon-tab .tab-icon svg { width: 22px; height: 22px; fill: none; stroke-width: 1.8; transition: stroke 0.15s; }
+  .icon-tab .tab-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .icon-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--text);
+    border-radius: 1px;
+    transition: width 0.15s;
+  }
+  .icon-tab.active .tab-icon { border-color: var(--text); }
+  .icon-tab.active .tab-label { color: var(--text); font-weight: 600; }
+  .icon-tab.active::after { width: 70%; }
+  .icon-tab:hover .tab-label { color: var(--text-muted); }
+
+  .pill-filters {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 14px;
+    padding-bottom: 2px;
+  }
+  .pill-filters::-webkit-scrollbar { display: none; }
+
+  .pill-filter {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pill-filter:hover { border-color: var(--accent-border); color: var(--text); }
+  .pill-filter.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+  .pill-filter svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .pill-filter-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pill-filter-icon:hover { border-color: var(--accent-border); }
+  .pill-filter-icon svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
+
+  .shop-vertical { display: none; }
+  .shop-vertical.active { display: block; }
+
+  .back-to-shop {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 0;
+    margin-bottom: 12px;
+    transition: color 0.15s;
+  }
+  .back-to-shop:hover { color: var(--accent); }
+  .back-to-shop svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; align-items: center; }
+    .side-panel { max-width: var(--phone-width); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Fanatics Collect — Structural Model</h1>
+  <p>Interactive wireframe showing the ownership-first information architecture. Tap the tabs below to explore each pillar. Header icons open global layers.</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Primary Pillars</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>Global Layers</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Migrates Here</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div>Migrates Away</div>
+</div>
+
+<div class="layout">
+
+  <!-- Phone -->
+  <div class="phone">
+    <div class="status-bar"><div class="dynamic-island"></div></div>
+
+    <div class="app-header">
+      <div style="display:flex;align-items:center;gap:4px">
+        <div id="header-back" style="display:none;cursor:pointer;padding:2px" onclick="headerBack()">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--text);fill:none;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div class="title" id="header-title">Home</div>
+      </div>
+      <div class="header-icons">
+        <div class="header-icon" onclick="toggleOverlay('cart')" id="icon-cart" title="Cart">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </div>
+        <div class="header-icon" onclick="toggleOverlay('inbox')" id="icon-inbox" title="Inbox">
+          <svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+          <div class="badge"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-content">
+
+      <!-- HOME -->
+      <div class="screen active" id="screen-home">
+        <div class="section-label">Priority Tasks</div>
+        <div class="priority-card">
+          <div class="card-title">Payment due — Order #4821</div>
+          <div class="card-desc">Due in 2 hours. Tap to complete.</div>
+        </div>
+
+        <div class="section-label">Portfolio Highlights</div>
+        <div class="wire-card">
+          <div class="card-title">Your collection is up 4.2%</div>
+          <div class="card-desc">3 items changed value since last visit</div>
+        </div>
+
+        <div class="section-label">Since Last Visit</div>
+        <div class="wire-card">
+          <div class="card-title">2 auctions closing soon</div>
+          <div class="card-desc">Items you're watching in Saved</div>
+        </div>
+        <div class="wire-card">
+          <div class="card-title">Grading complete — PSA 10</div>
+          <div class="card-desc">2023 Topps Chrome Wembanyama</div>
+        </div>
+
+        <div class="section-label">Entry Points</div>
+        <div class="placeholder-block"></div>
+      </div>
+
+      <!-- SHOP -->
+      <div class="screen" id="screen-shop">
+
+        <!-- Shop Home -->
+        <div id="shop-home">
+          <div class="shop-home-grid">
+            <div class="shop-entry" onclick="shopVertical('cards')">
+              <div class="entry-icon" style="background:var(--accent-soft)">
+                <svg viewBox="0 0 24 24" style="stroke:var(--accent)"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+              </div>
+              <div class="entry-label">Cards</div>
+              <div class="entry-sub">Singles & graded cards</div>
+            </div>
+            <div class="shop-entry" onclick="shopVertical('packs')">
+              <div class="entry-icon" style="background:var(--amber-soft)">
+                <svg viewBox="0 0 24 24" style="stroke:var(--amber)"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+              <div class="entry-label">Packs</div>
+              <div class="entry-sub">Hobby boxes & retail</div>
+            </div>
+            <div class="shop-entry" onclick="shopVertical('drops')">
+              <div class="entry-icon" style="background:var(--cyan-soft)">
+                <svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <div class="entry-label">Drops</div>
+              <div class="entry-sub">Exclusives & releases</div>
+            </div>
+            <div class="shop-entry" onclick="shopVertical('live')">
+              <div class="entry-icon" style="background:var(--rose-soft)">
+                <svg viewBox="0 0 24 24" style="stroke:var(--rose)"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              </div>
+              <div class="entry-label">Live</div>
+              <div class="entry-sub">Streams & breaks</div>
+            </div>
+          </div>
+
+          <div class="carousel-header">
+            <div class="carousel-title">Recommended Cards</div>
+            <div class="view-all" onclick="shopVertical('cards')">View All</div>
+          </div>
+          <div class="carousel-row">
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Wembanyama RC</div>
+                <div class="card-price">$1,245</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Edwards Prizm</div>
+                <div class="card-price">$89</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Ohtani Chrome</div>
+                <div class="card-price">$215</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Mahomes Mosaic</div>
+                <div class="card-price">$178</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-header">
+            <div class="carousel-title">Recommended Packs</div>
+            <div class="view-all" onclick="shopVertical('packs')">View All</div>
+          </div>
+          <div class="carousel-row">
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Prizm Hobby Box</div>
+                <div class="card-price">$389</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Chrome Hobby</div>
+                <div class="card-price">$275</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Bowman Draft</div>
+                <div class="card-price">$195</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Select Blaster</div>
+                <div class="card-price">$42</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-header">
+            <div class="carousel-title">Latest Topps Release</div>
+            <div class="view-all" onclick="shopVertical('drops')">View All</div>
+          </div>
+          <div class="carousel-row">
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">2025 Series 1</div>
+                <div class="card-info">Just released</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Chrome Black</div>
+                <div class="card-info">Limited edition</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Pristine Parallels</div>
+                <div class="card-info">Exclusive drop</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-header">
+            <div class="carousel-title">Live Now</div>
+            <div class="view-all" onclick="shopVertical('live')">View All</div>
+          </div>
+          <div class="carousel-row">
+            <div class="carousel-card live-card">
+              <div class="card-thumb" style="position:relative">
+                <span class="live-badge-sm">Live</span>
+              </div>
+              <div class="card-body">
+                <div class="card-name">@breaker_nation</div>
+                <div class="card-info">823 watching</div>
+              </div>
+            </div>
+            <div class="carousel-card live-card">
+              <div class="card-thumb" style="position:relative">
+                <span class="live-badge-sm">Live</span>
+              </div>
+              <div class="card-body">
+                <div class="card-name">@chrome_rips</div>
+                <div class="card-info">412 watching</div>
+              </div>
+            </div>
+            <div class="carousel-card">
+              <div class="card-thumb"></div>
+              <div class="card-body">
+                <div class="card-name">Tonight 8pm ET</div>
+                <div class="card-info">Chrome Hobby</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards vertical -->
+        <div class="shop-vertical" id="shop-cards">
+          <div class="icon-tabs" id="cards-tabs">
+            <div class="icon-tab active" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </div>
+              <div class="tab-label">For You</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--amber)"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <div class="tab-label">Basketball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--green)"><ellipse cx="12" cy="12" rx="10" ry="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+              </div>
+              <div class="tab-label">Football</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--accent)"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>
+              </div>
+              <div class="tab-label">Baseball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg>
+              </div>
+              <div class="tab-label">Soccer</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--text-muted)"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+              </div>
+              <div class="tab-label">Hockey</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon">
+                <svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20 12V7"/><path d="M4 12V7"/><path d="M2 12h20v4a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-4z"/></svg>
+              </div>
+              <div class="tab-label">UFC</div>
+            </div>
+          </div>
+
+          <div class="pill-filters">
+            <div class="pill-filter-icon" title="All filters">
+              <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </div>
+            <div class="pill-filter" id="watchlist-btn" onclick="this.classList.toggle('active')">
+              <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              Watchlist
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('format-dropdown')">
+                Format
+                <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="dropdown-menu" id="format-dropdown">
+                <div class="dropdown-option" onclick="selectFormat(this, 'All Formats')">All Formats</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Buy Now')">Buy Now</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Weekly Auction')">Weekly Auction</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Premier Auction')">Premier Auction</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('grade-dropdown')">
+                Grade
+                <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="dropdown-menu" id="grade-dropdown">
+                <div class="dropdown-option" onclick="selectGrade(this, 'All Grades')">All Grades</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 10')">PSA 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 9')">PSA 9</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'BGS 9.5')">BGS 9.5</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'SGC 10')">SGC 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'Raw')">Raw</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('price-dropdown')">
+                Price
+                <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="dropdown-menu" id="price-dropdown">
+                <div class="dropdown-option" onclick="selectPrice(this, 'Any Price')">Any Price</div>
+                <div class="dropdown-option" onclick="selectPrice(this, 'Under $25')">Under $25</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$25–$100')">$25–$100</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$100–$500')">$100–$500</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$500+')">$500+</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2023 Topps Chrome #1 Wembanyama RC</div>
+              <div class="listing-meta">PSA 10 · Topps Chrome · Basketball</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$1,245</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Prizm Silver Anthony Edwards</div>
+              <div class="listing-meta">Raw · Panini Prizm · Basketball</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$89</div>
+                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Weekly</span>
+                <span style="font-size:10px;color:var(--text-dim)">3h 12m left</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2022 Bowman Chrome Auto Holman</div>
+              <div class="listing-meta">BGS 9.5 · Bowman Chrome · Basketball</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$342</div>
+                <span class="listing-badge" style="background:var(--rose-soft);color:var(--rose)">Premier</span>
+                <span style="font-size:10px;color:var(--text-dim)">2d left</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Topps Series 1 Skenes RC</div>
+              <div class="listing-meta">PSA 9 · Topps Series 1 · Baseball</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$56</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Packs vertical -->
+        <div class="shop-vertical" id="shop-packs">
+          <div class="icon-tabs">
+            <div class="icon-tab active" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+              <div class="tab-label">For You</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div class="tab-label">Basketball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><ellipse cx="12" cy="12" rx="10" ry="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+              <div class="tab-label">Football</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--accent)"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg></div>
+              <div class="tab-label">Baseball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg></div>
+              <div class="tab-label">Soccer</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--text-muted)"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg></div>
+              <div class="tab-label">Hockey</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20 12V7"/><path d="M4 12V7"/><path d="M2 12h20v4a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-4z"/></svg></div>
+              <div class="tab-label">UFC</div>
+            </div>
+          </div>
+          <div class="pill-filters">
+            <div class="pill-filter-icon" title="All filters"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+            <div class="pill-filter" onclick="this.classList.toggle('active')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist</div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('packs-format-dd')">Format <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="packs-format-dd">
+                <div class="dropdown-option" onclick="selectFormat(this, 'All Formats')">All Formats</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Buy Now')">Buy Now</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Weekly Auction')">Weekly Auction</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Premier Auction')">Premier Auction</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('packs-grade-dd')">Grade <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="packs-grade-dd">
+                <div class="dropdown-option" onclick="selectGrade(this, 'All Grades')">All Grades</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 10')">PSA 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 9')">PSA 9</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'BGS 9.5')">BGS 9.5</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'SGC 10')">SGC 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'Raw')">Raw</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('packs-price-dd')">Price <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="packs-price-dd">
+                <div class="dropdown-option" onclick="selectPrice(this, 'Any Price')">Any Price</div>
+                <div class="dropdown-option" onclick="selectPrice(this, 'Under $25')">Under $25</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$25–$100')">$25–$100</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$100–$500')">$100–$500</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$500+')">$500+</div>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Prizm Hobby Box</div>
+              <div class="listing-meta">Panini Prizm · Basketball · Hobby</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$389</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Topps Chrome Hobby</div>
+              <div class="listing-meta">Topps Chrome · Baseball · Hobby</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$275</div>
+                <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2024 Bowman Draft Jumbo</div>
+              <div class="listing-meta">Bowman Draft · Baseball · Jumbo</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$195</div>
+                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Weekly</span>
+                <span style="font-size:10px;color:var(--text-dim)">1d 4h left</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drops vertical -->
+        <div class="shop-vertical" id="shop-drops">
+          <div class="icon-tabs">
+            <div class="icon-tab active" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+              <div class="tab-label">For You</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div class="tab-label">Basketball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><ellipse cx="12" cy="12" rx="10" ry="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+              <div class="tab-label">Football</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--accent)"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg></div>
+              <div class="tab-label">Baseball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg></div>
+              <div class="tab-label">Soccer</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--text-muted)"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg></div>
+              <div class="tab-label">Hockey</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20 12V7"/><path d="M4 12V7"/><path d="M2 12h20v4a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-4z"/></svg></div>
+              <div class="tab-label">UFC</div>
+            </div>
+          </div>
+          <div class="pill-filters">
+            <div class="pill-filter-icon" title="All filters"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+            <div class="pill-filter" onclick="this.classList.toggle('active')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist</div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('drops-format-dd')">Format <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="drops-format-dd">
+                <div class="dropdown-option" onclick="selectFormat(this, 'All Formats')">All Formats</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Buy Now')">Buy Now</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Weekly Auction')">Weekly Auction</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Premier Auction')">Premier Auction</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('drops-grade-dd')">Grade <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="drops-grade-dd">
+                <div class="dropdown-option" onclick="selectGrade(this, 'All Grades')">All Grades</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 10')">PSA 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 9')">PSA 9</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'BGS 9.5')">BGS 9.5</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'SGC 10')">SGC 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'Raw')">Raw</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('drops-price-dd')">Price <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="drops-price-dd">
+                <div class="dropdown-option" onclick="selectPrice(this, 'Any Price')">Any Price</div>
+                <div class="dropdown-option" onclick="selectPrice(this, 'Under $25')">Under $25</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$25–$100')">$25–$100</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$100–$500')">$100–$500</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$500+')">$500+</div>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">Digital Packs — Series 3</div>
+              <div class="listing-meta">Fanatics Exclusive · Multi-sport</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$14.99</div>
+                <span class="listing-badge" style="background:var(--cyan-soft);color:var(--cyan)">Drop</span>
+                <span style="font-size:10px;color:var(--text-dim)">Fri 12pm ET</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">Exclusive Chrome Parallels</div>
+              <div class="listing-meta">Limited to 500 · Instant rip</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$29.99</div>
+                <span class="listing-badge" style="background:var(--cyan-soft);color:var(--cyan)">Drop</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">2025 Topps Series 1 Early Access</div>
+              <div class="listing-meta">Baseball · Hobby box</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="listing-price">$89.99</div>
+                <span class="listing-badge" style="background:var(--green-soft);color:var(--green)">New</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live vertical -->
+        <div class="shop-vertical" id="shop-live">
+          <div class="icon-tabs">
+            <div class="icon-tab active" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+              <div class="tab-label">For You</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div class="tab-label">Basketball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><ellipse cx="12" cy="12" rx="10" ry="6"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div>
+              <div class="tab-label">Football</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--accent)"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg></div>
+              <div class="tab-label">Baseball</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg></div>
+              <div class="tab-label">Soccer</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--text-muted)"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg></div>
+              <div class="tab-label">Hockey</div>
+            </div>
+            <div class="icon-tab" onclick="selectIconTab(this)">
+              <div class="tab-icon"><svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20 12V7"/><path d="M4 12V7"/><path d="M2 12h20v4a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-4z"/></svg></div>
+              <div class="tab-label">UFC</div>
+            </div>
+          </div>
+          <div class="pill-filters">
+            <div class="pill-filter-icon" title="All filters"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+            <div class="pill-filter" onclick="this.classList.toggle('active')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist</div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('live-format-dd')">Format <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="live-format-dd">
+                <div class="dropdown-option" onclick="selectFormat(this, 'All Formats')">All Formats</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Buy Now')">Buy Now</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Weekly Auction')">Weekly Auction</div>
+                <div class="dropdown-option" onclick="selectFormat(this, 'Premier Auction')">Premier Auction</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('live-grade-dd')">Grade <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="live-grade-dd">
+                <div class="dropdown-option" onclick="selectGrade(this, 'All Grades')">All Grades</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 10')">PSA 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'PSA 9')">PSA 9</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'BGS 9.5')">BGS 9.5</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'SGC 10')">SGC 10</div>
+                <div class="dropdown-option" onclick="selectGrade(this, 'Raw')">Raw</div>
+              </div>
+            </div>
+            <div class="dropdown-chip">
+              <div class="pill-filter" onclick="toggleDropdown('live-price-dd')">Price <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dropdown-menu" id="live-price-dd">
+                <div class="dropdown-option" onclick="selectPrice(this, 'Any Price')">Any Price</div>
+                <div class="dropdown-option" onclick="selectPrice(this, 'Under $25')">Under $25</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$25–$100')">$25–$100</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$100–$500')">$100–$500</div>
+                <div class="dropdown-option" onclick="selectPrice(this, '$500+')">$500+</div>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card" style="border-left:3px solid var(--rose)">
+            <div class="listing-thumb" style="position:relative"><span class="live-badge-sm" style="position:absolute;top:6px;left:6px">Live</span></div>
+            <div class="listing-info">
+              <div class="listing-title">Weekend Breaks with @breaker_nation</div>
+              <div class="listing-meta">823 watching · Hobby boxes</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="listing-badge" style="background:var(--rose-soft);color:var(--rose)">Live Now</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">Chrome Rips — Tonight 8pm ET</div>
+              <div class="listing-meta">2024 Topps Chrome · Scheduled</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Upcoming</span>
+                <span style="font-size:10px;color:var(--text-dim)">Starts in 3h</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-card">
+            <div class="listing-thumb"></div>
+            <div class="listing-info">
+              <div class="listing-title">Sunday Night Football Rips</div>
+              <div class="listing-meta">@gridiron_breaks · NFL</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Upcoming</span>
+                <span style="font-size:10px;color:var(--text-dim)">Sun 7pm ET</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="screen" id="screen-search">
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Search cards, players, sets…</span>
+        </div>
+
+        <div class="section-label">Result Types</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--accent-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--accent)"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Marketplace Listings</div>
+            <div class="row-sub">Active Buy Now & Auction items</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--cyan-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="12"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Entity Hubs</div>
+            <div class="row-sub">Players, teams, sets, IP</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--amber-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--amber)"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Catalogue Records</div>
+            <div class="row-sub">Canonical card pages (even without listings)</div>
+          </div>
+        </div>
+
+        <div class="section-label">Recent Searches</div>
+        <div class="wire-card"><div class="card-desc">Victor Wembanyama rookie</div></div>
+        <div class="wire-card"><div class="card-desc">2024 Topps Series 1</div></div>
+      </div>
+
+      <!-- COLLECTION -->
+      <div class="screen" id="screen-collection">
+        <div class="section-label">Ownership</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--accent-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--accent)"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">All Items</div>
+            <div class="row-sub">247 items in collection</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--cyan-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><rect x="2" y="6" width="16" height="14" rx="2"/><rect x="6" y="2" width="16" height="14" rx="2"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Stacks</div>
+            <div class="row-sub">Multi-membership groupings · 12 stacks</div>
+          </div>
+        </div>
+
+        <div class="section-label">Initiatives</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--amber-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Quests</div>
+            <div class="row-sub">Task-based collecting challenges</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--rose-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--rose)"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Programs</div>
+            <div class="row-sub">Performance Cards, Red Rookie</div>
+          </div>
+        </div>
+
+        <div class="section-label">Community Intent</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--green-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Want List</div>
+            <div class="row-sub">Public intent signal · Stack-based</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOUNT -->
+      <div class="screen" id="screen-account">
+        <div class="section-label">Commerce</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--accent-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--accent)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Orders</div>
+            <div class="row-sub">Commerce ledger — what you bought</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--green-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--green)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Selling</div>
+            <div class="row-sub">Manage active & past listings</div>
+          </div>
+        </div>
+
+        <div class="section-label">Operations</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--cyan-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Vault Activity</div>
+            <div class="row-sub">Custody workflows & operations log</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--amber-soft)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--amber)"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Wallet</div>
+            <div class="row-sub">Balances, payouts, FanCash</div>
+          </div>
+        </div>
+
+        <div class="section-label">Settings</div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--surface-3)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--text-dim)"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Preferences</div>
+            <div class="row-sub">Notifications, privacy, display</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--surface-3)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--text-dim)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Fanatics One Identity</div>
+            <div class="row-sub">Profile, linked accounts</div>
+          </div>
+        </div>
+        <div class="wire-row">
+          <div class="row-icon" style="background:var(--surface-3)">
+            <svg viewBox="0 0 24 24" style="stroke:var(--text-dim)"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-title">Help</div>
+            <div class="row-sub">Support, FAQs, contact</div>
+          </div>
+        </div>
+
+        <div class="migration-callout">
+          <div class="callout-title">
+            <span class="migration-badge from">Removed</span>
+            Previously in Account
+          </div>
+          <div class="migration-arrow">
+            <span class="from-label">Offers</span>
+            <span class="arrow">→</span>
+            <span class="to-label">Inbox (global layer)</span>
+          </div>
+          <div class="migration-arrow">
+            <span class="from-label">Bids</span>
+            <span class="arrow">→</span>
+            <span class="to-label">Shop → Watchlist</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Cart -->
+    <div class="overlay-panel" id="overlay-cart">
+      <div class="overlay-close" onclick="closeOverlay()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <div class="overlay-title">Cart</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Persistent · Cross-device · Commerce utility</div>
+      <div class="wire-card">
+        <div class="card-title">2024 Prizm Hobby Box</div>
+        <div class="card-desc">$389.00</div>
+      </div>
+      <div class="wire-card">
+        <div class="card-title">2023 Topps Chrome Blaster</div>
+        <div class="card-desc">$42.99</div>
+      </div>
+      <div style="margin-top:12px;padding:14px 16px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--radius);text-align:center;font-size:14px;font-weight:600;color:var(--accent)">
+        Checkout — $431.99
+      </div>
+    </div>
+
+    <!-- Overlay: Inbox (unified Messages + Offers + Alerts) -->
+    <div class="overlay-panel" id="overlay-inbox">
+      <div class="overlay-close" onclick="closeOverlay()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <div class="overlay-title">Inbox</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">All communications in one place</div>
+
+      <div class="chip-row" id="inbox-filters">
+        <div class="chip active" onclick="inboxFilter('all')">All</div>
+        <div class="chip" onclick="inboxFilter('messages')">Messages</div>
+        <div class="chip" onclick="inboxFilter('offers')">Offers</div>
+        <div class="chip" onclick="inboxFilter('alerts')">Alerts</div>
+      </div>
+
+      <div id="inbox-feed">
+        <!-- Alert items -->
+        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--amber)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--amber)">Alert</span>
+            <span style="font-size:10px;color:var(--text-dim)">2h ago</span>
+          </div>
+          <div class="card-title">Payment due — Order #4821</div>
+          <div class="card-desc">Due in 2 hours. Tap to complete.</div>
+        </div>
+
+        <!-- Offer items -->
+        <div class="wire-card inbox-item inbox-offers" style="border-left:3px solid var(--green)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--green)">Offer</span>
+            <span style="font-size:10px;color:var(--text-dim)">3h ago</span>
+          </div>
+          <div class="card-title">@collector_mike</div>
+          <div class="card-desc">Offer: $180 for your 2023 Bowman Chrome Auto</div>
+          <div style="font-size:11px;color:var(--green);margin-top:4px">Active negotiation · Tap to respond</div>
+        </div>
+
+        <!-- Message item -->
+        <div class="wire-card inbox-item inbox-messages">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Message</span>
+            <span style="font-size:10px;color:var(--text-dim)">5h ago</span>
+          </div>
+          <div class="card-title">@vintage_pulls</div>
+          <div class="card-desc">Thanks! Just shipped it out today</div>
+        </div>
+
+        <!-- Offer item -->
+        <div class="wire-card inbox-item inbox-offers" style="border-left:3px solid var(--green)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--green)">Offer</span>
+            <span style="font-size:10px;color:var(--text-dim)">6h ago</span>
+          </div>
+          <div class="card-title">@wax_breaker_22</div>
+          <div class="card-desc">Counter-offer: $95 + shipping</div>
+          <div style="font-size:11px;color:var(--amber);margin-top:4px">Awaiting your response</div>
+        </div>
+
+        <!-- Alert item -->
+        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--cyan)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--cyan)">Alert</span>
+            <span style="font-size:10px;color:var(--text-dim)">1d ago</span>
+          </div>
+          <div class="card-title">Grading complete — PSA 10</div>
+          <div class="card-desc">2023 Topps Chrome Wembanyama</div>
+        </div>
+
+        <!-- Message item -->
+        <div class="wire-card inbox-item inbox-messages">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Message</span>
+            <span style="font-size:10px;color:var(--text-dim)">1d ago</span>
+          </div>
+          <div class="card-title">@hobby_king_99</div>
+          <div class="card-desc">Did you see the new Topps drop? Crazy parallels.</div>
+        </div>
+
+        <!-- Alert item -->
+        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--accent)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Alert</span>
+            <span style="font-size:10px;color:var(--text-dim)">2d ago</span>
+          </div>
+          <div class="card-title">Vault item shipped</div>
+          <div class="card-desc">Tracking: 1Z999AA10...</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:12px;background:var(--surface-3);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted);line-height:1.5">
+        <strong style="color:var(--text)">Unified Inbox:</strong> Messages, Offers, and Alerts in one feed. Filter to focus. Offers are negotiation threads. Alerts clear when resolved. Thread view enters focused mode.
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('home')" id="tab-home">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab" onclick="switchTab('shop')" id="tab-shop">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>Shop</span>
+      </div>
+      <div class="tab" onclick="switchTab('search')" id="tab-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Search</span>
+      </div>
+      <div class="tab" onclick="switchTab('collection')" id="tab-collection">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span>Collection</span>
+      </div>
+      <div class="tab" onclick="switchTab('account')" id="tab-account">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Account</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side Panel: IA Map -->
+  <div class="side-panel">
+
+    <div class="panel-block">
+      <h3><div class="dot" style="background:var(--cyan)"></div>Global Utility Layers</h3>
+      <div class="tree">
+        <div class="tree-group">
+          <div class="tree-heading">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--cyan);fill:none;stroke-width:2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            Inbox
+            <span class="migration-badge to" style="font-size:9px">← Offers + Alerts</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Filterable feed: All / Messages / Offers / Alerts</span></div>
+            <div class="tree-item"><span class="tree-line">·</span>
+              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
+                Messages
+                <span style="font-size:10px;color:var(--text-muted)">User ↔ User</span>
+              </span>
+            </div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Conversations, collector relationships</span></div>
+            <div class="tree-item"><span class="tree-line">·</span>
+              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
+                Offers
+                <span style="font-size:10px;color:var(--text-muted)">Negotiation threads</span>
+              </span>
+            </div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Buy/sell offers, counter-offers, trades (future)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span>
+              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
+                Alerts
+                <span style="font-size:10px;color:var(--text-muted)">System → User</span>
+              </span>
+            </div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Payments, state changes, vault ops. Cleared when resolved.</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-note">Thread view enters focused mode</span></div>
+          </div>
+        </div>
+        <div class="tree-group">
+          <div class="tree-heading">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--cyan);fill:none;stroke-width:2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Cart
+          </div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Persistent, cross-device</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Commerce utility, not a pillar</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3><div class="dot" style="background:var(--accent)"></div>Primary Pillars</h3>
+      <div class="tree">
+        <div class="tree-group">
+          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('home')">Home <span class="tree-note" style="font-weight:400">— Orchestration</span></div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Priority tasks</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Portfolio highlights</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Contextual summaries</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Entry points to focused modes</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">References, never replaces other pillars</span></div>
+          </div>
+        </div>
+        <div class="tree-group">
+          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('shop')">Shop <span class="tree-note" style="font-weight:400">— Discovery & Commerce</span></div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Shop Home (default landing)</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Entry point grid + recommendation carousels</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Cards / Packs / Releases / Live Now</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">"View All" → dedicated vertical surface</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Dedicated Verticals</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Cards / Packs / Drops / Live</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Browse Filters (within each vertical)</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Filter · Watchlist · Format · Category pills</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Single scrollable row</span></div>
+            <div class="tree-item"><span class="tree-line">·</span>
+              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
+                Watchlist
+                <span class="migration-badge to" style="font-size:9px">← Saved/Bids</span>
+              </span>
+            </div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Inline filter for saved items & bid activity</span></div>
+          </div>
+        </div>
+        <div class="tree-group">
+          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('search')">Search <span class="tree-note" style="font-weight:400">— Utility & Hubs</span></div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Marketplace listings</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Entity hubs (players, teams, sets)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Catalogue records</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Intent-driven, distinct from Shop browse</span></div>
+          </div>
+        </div>
+        <div class="tree-group">
+          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('collection')">Collection <span class="tree-note" style="font-weight:400">— Ownership</span></div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">All Items</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Stacks (multi-membership)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Quests (task-driven challenges)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Programs (Performance Cards, Red Rookie)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Want List (public intent, Stack-based)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">OIP (Owned Item Page)</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Portfolio-first, not a workflow log</span></div>
+          </div>
+        </div>
+        <div class="tree-group">
+          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('account')">Account <span class="tree-note" style="font-weight:400">— Operations</span></div>
+          <div class="tree-children">
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Orders (commerce ledger)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Selling (listing management)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Vault Activity (operations log)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Wallet (balances, payouts, FanCash)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Preferences / Help / Identity</span></div>
+            <div class="tree-item"><span class="tree-line"> </span>
+              <span class="tree-label" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span class="migration-badge from" style="font-size:9px">Offers → Inbox</span>
+                <span class="migration-badge from" style="font-size:9px">Bids → Shop Watchlist</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3><div class="dot" style="background:var(--amber)"></div>Focused Modes (nav suppressed)</h3>
+      <div class="tree">
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Messaging thread</span></div>
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Checkout (traditional)</span></div>
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Live stream</span></div>
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Scanner capture</span></div>
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Instant rip / break replay</span></div>
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Auction finale (future)</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const tabs = ['home', 'shop', 'search', 'collection', 'account'];
+  const titles = { home: 'Home', shop: 'Shop', search: 'Search', collection: 'Collection', account: 'Account' };
+
+  function switchTab(name) {
+    closeOverlay();
+    tabs.forEach(t => {
+      document.getElementById('screen-' + t).classList.toggle('active', t === name);
+      document.getElementById('tab-' + t).classList.toggle('active', t === name);
+    });
+    document.getElementById('header-title').textContent = titles[name];
+    document.getElementById('header-back').style.display = 'none';
+    if (name === 'shop') shopHome();
+  }
+
+  const verticals = ['cards', 'packs', 'drops', 'live'];
+
+  const verticalTitles = { cards: 'Cards', packs: 'Packs', drops: 'Drops', live: 'Live' };
+
+  function shopVertical(name) {
+    document.getElementById('shop-home').style.display = 'none';
+    verticals.forEach(v => {
+      const el = document.getElementById('shop-' + v);
+      if (el) {
+        el.classList.toggle('active', v === name);
+        el.style.display = (v === name) ? 'block' : 'none';
+      }
+    });
+    document.getElementById('header-title').textContent = verticalTitles[name] || 'Shop';
+    document.getElementById('header-back').style.display = '';
+    closeAllDropdowns();
+  }
+
+  function shopHome() {
+    verticals.forEach(v => {
+      const el = document.getElementById('shop-' + v);
+      if (el) {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      }
+    });
+    document.getElementById('shop-home').style.display = '';
+    document.getElementById('header-title').textContent = 'Shop';
+    document.getElementById('header-back').style.display = 'none';
+  }
+
+  function headerBack() {
+    const shopScreen = document.getElementById('screen-shop');
+    if (shopScreen && shopScreen.classList.contains('active')) {
+      shopHome();
+    }
+  }
+
+  function toggleDropdown(id) {
+    const menu = document.getElementById(id);
+    const isOpen = menu.classList.contains('open');
+    closeAllDropdowns();
+    if (!isOpen) menu.classList.add('open');
+  }
+
+  function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+  }
+
+  function selectDropdownOption(el, defaultLabel) {
+    el.closest('.dropdown-menu').querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const btn = el.closest('.dropdown-chip').querySelector('.pill-filter, .filter-btn');
+    const label = el.textContent;
+    btn.childNodes[0].textContent = label === defaultLabel ? defaultLabel.replace('All ', '').replace('Any ', '') + ' ' : label + ' ';
+    closeAllDropdowns();
+  }
+
+  function selectFormat(el, label) { selectDropdownOption(el, 'All Formats'); }
+  function selectGrade(el, label) { selectDropdownOption(el, 'All Grades'); }
+  function selectPrice(el, label) { selectDropdownOption(el, 'Any Price'); }
+
+  function selectIconTab(tab) {
+    tab.closest('.icon-tabs').querySelectorAll('.icon-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-chip')) closeAllDropdowns();
+  });
+
+  document.querySelectorAll('.category-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      this.parentElement.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.shop-vertical').forEach(v => {
+    v.style.display = v.classList.contains('active') ? '' : 'none';
+  });
+
+  let activeOverlay = null;
+  function toggleOverlay(name) {
+    if (activeOverlay === name) { closeOverlay(); return; }
+    closeOverlay();
+    document.getElementById('overlay-' + name).classList.add('active');
+    document.getElementById('icon-' + name).classList.add('active');
+    activeOverlay = name;
+  }
+  function closeOverlay() {
+    ['cart', 'inbox'].forEach(n => {
+      document.getElementById('overlay-' + n).classList.remove('active');
+      document.getElementById('icon-' + n).classList.remove('active');
+    });
+    activeOverlay = null;
+  }
+
+  function inboxFilter(type) {
+    const chips = document.querySelectorAll('#inbox-filters .chip');
+    chips.forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const items = document.querySelectorAll('.inbox-item');
+    items.forEach(item => {
+      if (type === 'all') {
+        item.style.display = 'block';
+      } else {
+        item.style.display = item.classList.contains('inbox-' + type) ? 'block' : 'none';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
