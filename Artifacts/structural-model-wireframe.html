@@ -195,7 +195,8 @@
     margin-bottom: 10px;
     margin-top: 20px;
   }
-  .section-label:first-child { margin-top: 0; }
+  .screen > .section-label:first-child,
+  .screen > .transient-banner + .section-label { margin-top: 0; }
 
   .wire-card {
     background: var(--surface-2);
@@ -264,20 +265,6 @@
   .chip:hover { border-color: var(--accent-border); color: var(--text); }
   .chip.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
 
-  .migration-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .migration-badge.from { background: var(--rose-soft); color: var(--rose); }
-  .migration-badge.to { background: var(--green-soft); color: var(--green); }
-
   .placeholder-block {
     height: 80px;
     border-radius: var(--radius);
@@ -316,6 +303,49 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   }
 
+  .transient-banner {
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+  .show-banners .transient-banner {
+    display: flex;
+  }
+  .transient-banner .banner-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .transient-banner .banner-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 2;
+  }
+  .transient-banner .banner-copy {
+    flex: 1;
+    min-width: 0;
+  }
+  .transient-banner .banner-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .transient-banner .banner-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
   .search-bar {
     background: var(--surface-2);
     border: 1px solid var(--border);
@@ -345,7 +375,12 @@
     flex: 1;
     max-width: 480px;
     min-width: 320px;
+    height: var(--phone-height);
+    max-height: var(--phone-height);
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  .side-panel::-webkit-scrollbar { display: none; }
 
   .panel-block {
     background: var(--surface);
@@ -387,6 +422,8 @@
   }
   .tree-item .tree-label { color: var(--text); }
   .tree-item .tree-note { color: var(--text-muted); font-size: 12px; }
+  .migrate-here { color: var(--green); font-size: 11px; font-weight: 600; }
+  .migrate-away { color: var(--rose); font-size: 11px; font-weight: 600; }
 
   .tree-group {
     margin-bottom: 4px;
@@ -395,42 +432,38 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
-    padding: 4px 0;
+    padding: 6px 8px;
     display: flex;
     align-items: center;
     gap: 6px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .tree-group .tree-heading:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+  .tree-group .tree-heading::after {
+    content: '▸';
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .tree-group.open .tree-heading::after {
+    content: '▾';
   }
   .tree-children {
     padding-left: 24px;
     border-left: 1px solid var(--border);
     margin-left: 4px;
   }
-
-  .migration-callout {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-top: 8px;
+  .tree-group:not(.open) .tree-children {
+    display: none;
   }
-  .migration-callout .callout-title {
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .migration-arrow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    padding: 4px 0;
-  }
-  .migration-arrow .arrow { color: var(--text-dim); }
-  .migration-arrow .from-label { color: var(--rose); }
-  .migration-arrow .to-label { color: var(--green); }
 
   .legend {
     display: flex;
@@ -461,31 +494,60 @@
     background: rgba(15, 17, 23, 0.85);
     backdrop-filter: blur(8px);
     z-index: 10;
-    padding: 20px;
-    overflow-y: auto;
+    overflow: hidden;
+    flex-direction: column;
   }
-  .overlay-panel.active { display: block; }
+  .overlay-panel.active { display: flex; }
+  .phone.focus-overlay-active .app-header,
+  .phone.focus-overlay-active .screen-content,
+  .phone.focus-overlay-active .tab-bar {
+    display: none;
+  }
+  .phone.focus-overlay-active .overlay-panel.active {
+    top: 54px;
+    bottom: 0;
+    background: var(--surface);
+    backdrop-filter: none;
+    z-index: 30;
+  }
+  .overlay-header {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
   .overlay-close {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: var(--surface-3);
-    border: 1px solid var(--border);
+    background: transparent;
+    border: 1px solid transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 11;
+    transition: all 0.15s;
+  }
+  .overlay-close:hover {
+    background: var(--surface-3);
+    border-color: var(--border);
   }
   .overlay-close svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 2; }
   .overlay-title {
     font-size: 17px;
     font-weight: 600;
-    margin-bottom: 16px;
+    letter-spacing: -0.2px;
   }
+  .overlay-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 20px;
+    scrollbar-width: none;
+  }
+  .overlay-body::-webkit-scrollbar { display: none; }
 
   .filter-bar {
     display: flex;
@@ -816,6 +878,33 @@
   .shop-vertical { display: none; }
   .shop-vertical.active { display: block; }
 
+  .shop-intent-toggle {
+    margin-bottom: 12px;
+  }
+  .saved-section {
+    margin-top: 18px;
+  }
+  .saved-section:first-child {
+    margin-top: 0;
+  }
+  .saved-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .saved-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .saved-count {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .bid-status-bid {
+    display: inline;
+  }
+
   .back-to-shop {
     display: flex;
     align-items: center;
@@ -853,7 +942,7 @@
 <div class="layout">
 
   <!-- Phone -->
-  <div class="phone">
+  <div class="phone" id="phone-shell">
     <div class="status-bar"><div class="dynamic-island"></div></div>
 
     <div class="app-header">
@@ -878,6 +967,15 @@
 
       <!-- HOME -->
       <div class="screen active" id="screen-home">
+        <div class="transient-banner">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Limited-time challenge: Weekend Collector Sprint</div>
+            <div class="banner-desc">Complete 3 actions for FanCash bonus. Ends Sunday 11:59pm ET.</div>
+          </div>
+        </div>
         <div class="section-label">Priority Tasks</div>
         <div class="priority-card">
           <div class="card-title">Payment due — Order #4821</div>
@@ -906,6 +1004,28 @@
 
       <!-- SHOP -->
       <div class="screen" id="screen-shop">
+        <div class="mode-toggle shop-intent-toggle" id="shop-intent-toggle">
+          <div class="mode-btn active" onclick="setShopIntent('discover')">Discover</div>
+          <div class="mode-btn" onclick="setShopIntent('saved')">Saved</div>
+        </div>
+        <div class="transient-banner" id="shop-banner-discover" style="cursor:pointer" onclick="openAuctions('browse', 'premier-apr')">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 10h18M7 6h10M9 14h6M10 18h4"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Premier Auction April is live</div>
+            <div class="banner-desc">Jump directly into the event browse view with Premier lots pre-filtered.</div>
+          </div>
+        </div>
+        <div class="transient-banner" id="shop-banner-saved" style="display:none">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-2-2h-5l-2-2H5a2 2 0 0 0-2 2v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4z"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Saved activity pulse</div>
+            <div class="banner-desc">Saved mode: highlight updates on watched listings, events, people, and searches.</div>
+          </div>
+        </div>
 
         <!-- Shop Home -->
         <div id="shop-home">
@@ -937,6 +1057,15 @@
               </div>
               <div class="entry-label">Live</div>
               <div class="entry-sub">Streams & breaks</div>
+            </div>
+          </div>
+          <div class="wire-card" style="margin-bottom:10px;cursor:pointer" onclick="openAuctions('browse', 'all')">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <div>
+                <div class="card-title">Auctions</div>
+                <div class="card-desc">Weekly and Premier events with Browse and My Bids.</div>
+              </div>
+              <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Live Event</span>
             </div>
           </div>
 
@@ -1122,10 +1251,6 @@
             <div class="pill-filter-icon" title="All filters">
               <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
             </div>
-            <div class="pill-filter" id="watchlist-btn" onclick="this.classList.toggle('active')">
-              <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-              Watchlist
-            </div>
             <div class="dropdown-chip">
               <div class="pill-filter" onclick="toggleDropdown('format-dropdown')">
                 Format
@@ -1252,7 +1377,6 @@
           </div>
           <div class="pill-filters">
             <div class="pill-filter-icon" title="All filters"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
-            <div class="pill-filter" onclick="this.classList.toggle('active')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist</div>
             <div class="dropdown-chip">
               <div class="pill-filter" onclick="toggleDropdown('packs-format-dd')">Format <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
               <div class="dropdown-menu" id="packs-format-dd">
@@ -1354,7 +1478,6 @@
           </div>
           <div class="pill-filters">
             <div class="pill-filter-icon" title="All filters"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
-            <div class="pill-filter" onclick="this.classList.toggle('active')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist</div>
             <div class="dropdown-chip">
               <div class="pill-filter" onclick="toggleDropdown('drops-format-dd')">Format <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
               <div class="dropdown-menu" id="drops-format-dd">
@@ -1456,7 +1579,6 @@
           </div>
           <div class="pill-filters">
             <div class="pill-filter-icon" title="All filters"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
-            <div class="pill-filter" onclick="this.classList.toggle('active')"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist</div>
             <div class="dropdown-chip">
               <div class="pill-filter" onclick="toggleDropdown('live-format-dd')">Format <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
               <div class="dropdown-menu" id="live-format-dd">
@@ -1521,10 +1643,224 @@
             </div>
           </div>
         </div>
+
+        <!-- Saved mode (centralized across entity types) -->
+        <div id="shop-saved" style="display:none">
+          <div id="saved-listings-surface">
+            <div class="saved-section">
+              <div class="saved-header">
+                <div class="saved-title">Listings</div>
+                <div class="saved-count">18 watching</div>
+              </div>
+              <div class="listing-card">
+                <div class="listing-thumb"></div>
+                <div class="listing-info">
+                  <div class="listing-title">2023 Topps Chrome #1 Wembanyama RC</div>
+                  <div class="listing-meta">Cards · PSA 10 · Watchlist</div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="listing-price">$1,245</div>
+                    <span class="listing-badge" style="background:var(--accent-soft);color:var(--accent)">Buy Now</span>
+                  </div>
+                </div>
+              </div>
+              <div class="listing-card">
+                <div class="listing-thumb"></div>
+                <div class="listing-info">
+                  <div class="listing-title">2024 Bowman Draft Jumbo</div>
+                  <div class="listing-meta">
+                    Packs · Weekly Auction ·
+                    <span class="bid-status-bid">Bid placed</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="listing-price">$195</div>
+                    <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Weekly</span>
+                    <span style="font-size:10px;color:var(--text-dim)">1d 4h left</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:5px;cursor:pointer" onclick="openAuctions('my-bids', 'all')">View in My Bids</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="saved-section">
+              <div class="saved-header">
+                <div class="saved-title">Events</div>
+                <div class="saved-count">5 upcoming</div>
+              </div>
+              <div class="wire-card">
+                <div class="card-title">Chrome Rips — Tonight 8pm ET</div>
+                <div class="card-desc">Live · 412 interested · Reminder set</div>
+              </div>
+              <div class="wire-card">
+                <div class="card-title">Sunday Night Football Rips</div>
+                <div class="card-desc">Live · Starts Sun 7pm ET · Following host</div>
+              </div>
+            </div>
+
+            <div class="saved-section">
+              <div class="saved-header">
+                <div class="saved-title">People</div>
+                <div class="saved-count">12 followed</div>
+              </div>
+              <div class="wire-row">
+                <div class="row-icon" style="background:var(--rose-soft)">
+                  <svg viewBox="0 0 24 24" style="stroke:var(--rose)"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
+                </div>
+                <div class="row-text">
+                  <div class="row-title">@breaker_nation</div>
+                  <div class="row-note">Live breaker · 2 events this week</div>
+                </div>
+              </div>
+              <div class="wire-row">
+                <div class="row-icon" style="background:var(--accent-soft)">
+                  <svg viewBox="0 0 24 24" style="stroke:var(--accent)"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
+                </div>
+                <div class="row-text">
+                  <div class="row-title">@vintage_pulls</div>
+                  <div class="row-note">Seller · 7 active listings match your interests</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="saved-section">
+              <div class="saved-header">
+                <div class="saved-title">Searches</div>
+                <div class="saved-count">9 saved</div>
+              </div>
+              <div class="wire-card">
+                <div class="card-title">"Wembanyama PSA 10 Topps Chrome"</div>
+                <div class="card-desc">3 new matches since yesterday</div>
+              </div>
+              <div class="wire-card">
+                <div class="card-title">"2024 Prizm Silver Edwards"</div>
+                <div class="card-desc">1 auction ending in 3h 12m</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="shop-vertical" id="shop-auctions">
+          <div class="mode-toggle" id="auctions-mode-toggle" style="margin-bottom:10px">
+            <div class="mode-btn active" onclick="setAuctionsMode('browse')">Browse</div>
+            <div class="mode-btn" onclick="setAuctionsMode('my-bids')">My Bids</div>
+          </div>
+          <div id="auctions-browse">
+            <div class="pill-filters">
+              <div class="pill-filter active" data-auctions-event="all" onclick="setAuctionsEventFilter(this, 'all')">All</div>
+              <div class="pill-filter" data-auctions-event="weekly-208" onclick="setAuctionsEventFilter(this, 'weekly-208')">Weekly #208</div>
+              <div class="pill-filter" data-auctions-event="premier-apr" onclick="setAuctionsEventFilter(this, 'premier-apr')">April Premier</div>
+              <div class="pill-filter" data-auctions-event="upcoming" onclick="setAuctionsEventFilter(this, 'upcoming')">Upcoming</div>
+            </div>
+            <div class="listing-card auction-browse-item" data-auction="weekly-208">
+              <div class="listing-thumb"></div>
+              <div class="listing-info">
+                <div class="listing-title">2024 Bowman Draft Jumbo</div>
+                <div class="listing-meta">Weekly #208 · Ends in 1d 4h · 23 bids</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="listing-price">$195</div>
+                  <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Weekly Auction</span>
+                </div>
+              </div>
+            </div>
+            <div class="listing-card auction-browse-item" data-auction="premier-apr">
+              <div class="listing-thumb"></div>
+              <div class="listing-info">
+                <div class="listing-title">2024 Prizm Silver Anthony Edwards</div>
+                <div class="listing-meta">April Premier · Ends in 3h 12m · 17 bids</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="listing-price">$89</div>
+                  <span class="listing-badge" style="background:var(--amber-soft);color:var(--amber)">Premier Auction</span>
+                </div>
+              </div>
+            </div>
+            <div class="listing-card auction-browse-item" data-auction="upcoming">
+              <div class="listing-thumb"></div>
+              <div class="listing-info">
+                <div class="listing-title">2023 Topps Chrome Ohtani</div>
+                <div class="listing-meta">Weekly #209 preview · Auction opens Friday 7pm ET</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="listing-badge" style="background:var(--surface-3);color:var(--text-muted)">Upcoming</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="auctions-my-bids" style="display:none">
+            <div>
+              <div class="mode-toggle" id="bids-view-toggle" style="margin-bottom:10px">
+                <div class="mode-btn active" onclick="setBidsView('active')">Active</div>
+                <div class="mode-btn" onclick="setBidsView('ended')">Ended</div>
+              </div>
+              <div class="pill-filters">
+                <div class="pill-filter-icon" title="All filters">
+                  <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                </div>
+                <div class="pill-filter active" id="bids-quick-all" data-bid-quick-chip="true" data-status="all" onclick="setBidsQuickStatus('all')">All</div>
+                <div class="pill-filter" id="bids-quick-secondary" data-bid-quick-chip="true" data-status="bid-needed" onclick="setBidsQuickStatus('secondary')">Bid Needed</div>
+                <div class="pill-filter" id="bids-quick-tertiary" data-bid-quick-chip="true" data-status="outbid" onclick="setBidsQuickStatus('tertiary')">Outbid</div>
+                <div class="dropdown-chip">
+                  <div class="pill-filter" onclick="toggleDropdown('bids-auction-dd')">
+                    <span id="bids-auction-label">All Auctions</span>
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="dropdown-menu" id="bids-auction-dd">
+                    <div class="dropdown-option" onclick="setBidsAuctionFilter('all')">All Auctions</div>
+                    <div class="dropdown-option" onclick="setBidsAuctionFilter('weekly-208')">Weekly #208</div>
+                    <div class="dropdown-option" onclick="setBidsAuctionFilter('premier-apr')">April Premier</div>
+                    <div class="dropdown-option" onclick="setBidsAuctionFilter('weekly-207')">Weekly #207</div>
+                  </div>
+                </div>
+                <div class="dropdown-chip">
+                  <div class="pill-filter" onclick="toggleDropdown('bids-status-dd')">
+                    <span id="bids-status-label">All Status</span>
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="dropdown-menu" id="bids-status-dd">
+                    <div class="dropdown-option" data-bids-status="all" onclick="setBidsStatusFilter('all')">All Status</div>
+                    <div class="dropdown-option" data-bids-status="bid-needed" onclick="setBidsStatusFilter('bid-needed')">Bid Needed</div>
+                    <div class="dropdown-option" data-bids-status="outbid" onclick="setBidsStatusFilter('outbid')">Outbid</div>
+                    <div class="dropdown-option" data-bids-status="extended" onclick="setBidsStatusFilter('extended')">Extended</div>
+                    <div class="dropdown-option" data-bids-status="won" onclick="setBidsStatusFilter('won')">Won</div>
+                    <div class="dropdown-option" data-bids-status="lost" onclick="setBidsStatusFilter('lost')">Lost</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="my-bids-list">
+              <div class="wire-card bid-item bid-active" data-auction="weekly-208" data-status="bid-needed">
+                <div class="card-title">2024 Bowman Draft Jumbo</div>
+                <div class="card-desc">Weekly #208 · Bid needed · Current high $195 · Ends in 1d 4h</div>
+              </div>
+              <div class="wire-card bid-item bid-active" data-auction="premier-apr" data-status="outbid">
+                <div class="card-title">2024 Prizm Silver Anthony Edwards</div>
+                <div class="card-desc">April Premier · Outbid · Current high $89 · Ends in 3h 12m</div>
+              </div>
+              <div class="wire-card bid-item bid-active" data-auction="weekly-208" data-status="extended">
+                <div class="card-title">2023 Topps Chrome Ohtani</div>
+                <div class="card-desc">Weekly #208 · Extended · You are leading at $215</div>
+              </div>
+              <div class="wire-card bid-item bid-ended" data-auction="premier-apr" data-status="won" style="display:none">
+                <div class="card-title">2022 Bowman Chrome Auto Holman</div>
+                <div class="card-desc">April Premier · Won · Final $342 · Order created</div>
+              </div>
+              <div class="wire-card bid-item bid-ended" data-auction="weekly-207" data-status="lost" style="display:none">
+                <div class="card-title">2024 Topps Series 1 Skenes RC</div>
+                <div class="card-desc">Weekly #207 · Lost · Final $56</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- SEARCH -->
       <div class="screen" id="screen-search">
+        <div class="transient-banner">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Saved search pulse</div>
+            <div class="banner-desc">3 saved searches have new matching listings.</div>
+          </div>
+        </div>
         <div class="search-bar">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Search cards, players, sets…</span>
@@ -1566,6 +1902,15 @@
 
       <!-- COLLECTION -->
       <div class="screen" id="screen-collection">
+        <div class="transient-banner">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M8 10h8M8 14h5"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Program milestone ready</div>
+            <div class="banner-desc">Performance Cards progress is ready to claim.</div>
+          </div>
+        </div>
         <div class="section-label">Ownership</div>
         <div class="wire-row">
           <div class="row-icon" style="background:var(--accent-soft)">
@@ -1620,6 +1965,15 @@
 
       <!-- ACCOUNT -->
       <div class="screen" id="screen-account">
+        <div class="transient-banner">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Wallet incentive</div>
+            <div class="banner-desc">Add funds this week to unlock 2% bonus credit.</div>
+          </div>
+        </div>
         <div class="section-label">Commerce</div>
         <div class="wire-row">
           <div class="row-icon" style="background:var(--accent-soft)">
@@ -1689,136 +2043,137 @@
           </div>
         </div>
 
-        <div class="migration-callout">
-          <div class="callout-title">
-            <span class="migration-badge from">Removed</span>
-            Previously in Account
-          </div>
-          <div class="migration-arrow">
-            <span class="from-label">Offers</span>
-            <span class="arrow">→</span>
-            <span class="to-label">Inbox (global layer)</span>
-          </div>
-          <div class="migration-arrow">
-            <span class="from-label">Bids</span>
-            <span class="arrow">→</span>
-            <span class="to-label">Shop → Watchlist</span>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Overlay: Cart -->
     <div class="overlay-panel" id="overlay-cart">
-      <div class="overlay-close" onclick="closeOverlay()">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="overlay-header">
+        <div class="overlay-title">Cart</div>
+        <div class="overlay-close" onclick="closeOverlay()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
       </div>
-      <div class="overlay-title">Cart</div>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Persistent · Cross-device · Commerce utility</div>
-      <div class="wire-card">
-        <div class="card-title">2024 Prizm Hobby Box</div>
-        <div class="card-desc">$389.00</div>
-      </div>
-      <div class="wire-card">
-        <div class="card-title">2023 Topps Chrome Blaster</div>
-        <div class="card-desc">$42.99</div>
-      </div>
-      <div style="margin-top:12px;padding:14px 16px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--radius);text-align:center;font-size:14px;font-weight:600;color:var(--accent)">
-        Checkout — $431.99
+      <div class="overlay-body">
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Persistent · Cross-device · Commerce utility</div>
+        <div class="transient-banner">
+          <div class="banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M7 4h-2l-1 2v2h2l2.4 8.2a2 2 0 0 0 1.9 1.4h6.8a2 2 0 0 0 1.9-1.4l1.8-6.2H9.2"/><circle cx="10" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg>
+          </div>
+          <div class="banner-copy">
+            <div class="banner-title">Add one more for free shipping</div>
+            <div class="banner-desc">You are $18 away. Featured blasters and supplies qualify.</div>
+          </div>
+        </div>
+        <div class="wire-card">
+          <div class="card-title">2024 Prizm Hobby Box</div>
+          <div class="card-desc">$389.00</div>
+        </div>
+        <div class="wire-card">
+          <div class="card-title">2023 Topps Chrome Blaster</div>
+          <div class="card-desc">$42.99</div>
+        </div>
+        <div style="margin-top:12px;padding:14px 16px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--radius);text-align:center;font-size:14px;font-weight:600;color:var(--accent)">
+          Checkout — $431.99
+        </div>
       </div>
     </div>
 
     <!-- Overlay: Inbox (unified Messages + Offers + Alerts) -->
     <div class="overlay-panel" id="overlay-inbox">
-      <div class="overlay-close" onclick="closeOverlay()">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </div>
-      <div class="overlay-title">Inbox</div>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">All communications in one place</div>
-
-      <div class="chip-row" id="inbox-filters">
-        <div class="chip active" onclick="inboxFilter('all')">All</div>
-        <div class="chip" onclick="inboxFilter('messages')">Messages</div>
-        <div class="chip" onclick="inboxFilter('offers')">Offers</div>
-        <div class="chip" onclick="inboxFilter('alerts')">Alerts</div>
-      </div>
-
-      <div id="inbox-feed">
-        <!-- Alert items -->
-        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--amber)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--amber)">Alert</span>
-            <span style="font-size:10px;color:var(--text-dim)">2h ago</span>
-          </div>
-          <div class="card-title">Payment due — Order #4821</div>
-          <div class="card-desc">Due in 2 hours. Tap to complete.</div>
-        </div>
-
-        <!-- Offer items -->
-        <div class="wire-card inbox-item inbox-offers" style="border-left:3px solid var(--green)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--green)">Offer</span>
-            <span style="font-size:10px;color:var(--text-dim)">3h ago</span>
-          </div>
-          <div class="card-title">@collector_mike</div>
-          <div class="card-desc">Offer: $180 for your 2023 Bowman Chrome Auto</div>
-          <div style="font-size:11px;color:var(--green);margin-top:4px">Active negotiation · Tap to respond</div>
-        </div>
-
-        <!-- Message item -->
-        <div class="wire-card inbox-item inbox-messages">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Message</span>
-            <span style="font-size:10px;color:var(--text-dim)">5h ago</span>
-          </div>
-          <div class="card-title">@vintage_pulls</div>
-          <div class="card-desc">Thanks! Just shipped it out today</div>
-        </div>
-
-        <!-- Offer item -->
-        <div class="wire-card inbox-item inbox-offers" style="border-left:3px solid var(--green)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--green)">Offer</span>
-            <span style="font-size:10px;color:var(--text-dim)">6h ago</span>
-          </div>
-          <div class="card-title">@wax_breaker_22</div>
-          <div class="card-desc">Counter-offer: $95 + shipping</div>
-          <div style="font-size:11px;color:var(--amber);margin-top:4px">Awaiting your response</div>
-        </div>
-
-        <!-- Alert item -->
-        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--cyan)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--cyan)">Alert</span>
-            <span style="font-size:10px;color:var(--text-dim)">1d ago</span>
-          </div>
-          <div class="card-title">Grading complete — PSA 10</div>
-          <div class="card-desc">2023 Topps Chrome Wembanyama</div>
-        </div>
-
-        <!-- Message item -->
-        <div class="wire-card inbox-item inbox-messages">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Message</span>
-            <span style="font-size:10px;color:var(--text-dim)">1d ago</span>
-          </div>
-          <div class="card-title">@hobby_king_99</div>
-          <div class="card-desc">Did you see the new Topps drop? Crazy parallels.</div>
-        </div>
-
-        <!-- Alert item -->
-        <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--accent)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Alert</span>
-            <span style="font-size:10px;color:var(--text-dim)">2d ago</span>
-          </div>
-          <div class="card-title">Vault item shipped</div>
-          <div class="card-desc">Tracking: 1Z999AA10...</div>
+      <div class="overlay-header">
+        <div class="overlay-title">Inbox</div>
+        <div class="overlay-close" onclick="closeOverlay()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </div>
       </div>
+      <div class="overlay-body">
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">All communications in one place</div>
 
-      <div style="margin-top:16px;padding:12px;background:var(--surface-3);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted);line-height:1.5">
-        <strong style="color:var(--text)">Unified Inbox:</strong> Messages, Offers, and Alerts in one feed. Filter to focus. Offers are negotiation threads. Alerts clear when resolved. Thread view enters focused mode.
+        <div class="chip-row" id="inbox-filters">
+          <div class="chip active" onclick="inboxFilter('all')">All</div>
+          <div class="chip" onclick="inboxFilter('messages')">Messages</div>
+          <div class="chip" onclick="inboxFilter('offers')">Offers</div>
+          <div class="chip" onclick="inboxFilter('alerts')">Alerts</div>
+        </div>
+
+        <div id="inbox-feed">
+          <!-- Alert items -->
+          <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--amber)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--amber)">Alert</span>
+              <span style="font-size:10px;color:var(--text-dim)">2h ago</span>
+            </div>
+            <div class="card-title">Payment due — Order #4821</div>
+            <div class="card-desc">Due in 2 hours. Tap to complete.</div>
+          </div>
+
+          <!-- Offer items -->
+          <div class="wire-card inbox-item inbox-offers" style="border-left:3px solid var(--green)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--green)">Offer</span>
+              <span style="font-size:10px;color:var(--text-dim)">3h ago</span>
+            </div>
+            <div class="card-title">@collector_mike</div>
+            <div class="card-desc">Offer: $180 for your 2023 Bowman Chrome Auto</div>
+            <div style="font-size:11px;color:var(--green);margin-top:4px">Active negotiation · Tap to respond</div>
+          </div>
+
+          <!-- Message item -->
+          <div class="wire-card inbox-item inbox-messages">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Message</span>
+              <span style="font-size:10px;color:var(--text-dim)">5h ago</span>
+            </div>
+            <div class="card-title">@vintage_pulls</div>
+            <div class="card-desc">Thanks! Just shipped it out today</div>
+          </div>
+
+          <!-- Offer item -->
+          <div class="wire-card inbox-item inbox-offers" style="border-left:3px solid var(--green)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--green)">Offer</span>
+              <span style="font-size:10px;color:var(--text-dim)">6h ago</span>
+            </div>
+            <div class="card-title">@wax_breaker_22</div>
+            <div class="card-desc">Counter-offer: $95 + shipping</div>
+            <div style="font-size:11px;color:var(--amber);margin-top:4px">Awaiting your response</div>
+          </div>
+
+          <!-- Alert item -->
+          <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--cyan)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--cyan)">Alert</span>
+              <span style="font-size:10px;color:var(--text-dim)">1d ago</span>
+            </div>
+            <div class="card-title">Grading complete — PSA 10</div>
+            <div class="card-desc">2023 Topps Chrome Wembanyama</div>
+          </div>
+
+          <!-- Message item -->
+          <div class="wire-card inbox-item inbox-messages">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Message</span>
+              <span style="font-size:10px;color:var(--text-dim)">1d ago</span>
+            </div>
+            <div class="card-title">@hobby_king_99</div>
+            <div class="card-desc">Did you see the new Topps drop? Crazy parallels.</div>
+          </div>
+
+          <!-- Alert item -->
+          <div class="wire-card inbox-item inbox-alerts" style="border-left:3px solid var(--accent)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent)">Alert</span>
+              <span style="font-size:10px;color:var(--text-dim)">2d ago</span>
+            </div>
+            <div class="card-title">Vault item shipped</div>
+            <div class="card-desc">Tracking: 1Z999AA10...</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;padding:12px;background:var(--surface-3);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted);line-height:1.5">
+          <strong style="color:var(--text)">Unified Inbox:</strong> Messages, Offers, and Alerts in one feed.
+        </div>
       </div>
     </div>
 
@@ -1851,38 +2206,25 @@
   <div class="side-panel">
 
     <div class="panel-block">
+      <h3><div class="dot" style="background:var(--accent)"></div>Prototype Controls</h3>
+      <div class="mode-toggle" id="banner-toggle">
+        <div class="mode-btn active" onclick="setBannerMode(false)">Banners Off</div>
+        <div class="mode-btn" onclick="setBannerMode(true)">Banners On</div>
+      </div>
+    </div>
+
+    <div class="panel-block">
       <h3><div class="dot" style="background:var(--cyan)"></div>Global Utility Layers</h3>
       <div class="tree">
         <div class="tree-group">
           <div class="tree-heading">
             <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--cyan);fill:none;stroke-width:2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
             Inbox
-            <span class="migration-badge to" style="font-size:9px">← Offers + Alerts</span>
           </div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Filterable feed: All / Messages / Offers / Alerts</span></div>
-            <div class="tree-item"><span class="tree-line">·</span>
-              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
-                Messages
-                <span style="font-size:10px;color:var(--text-muted)">User ↔ User</span>
-              </span>
-            </div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Conversations, collector relationships</span></div>
-            <div class="tree-item"><span class="tree-line">·</span>
-              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
-                Offers
-                <span style="font-size:10px;color:var(--text-muted)">Negotiation threads</span>
-              </span>
-            </div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Buy/sell offers, counter-offers, trades (future)</span></div>
-            <div class="tree-item"><span class="tree-line">·</span>
-              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
-                Alerts
-                <span style="font-size:10px;color:var(--text-muted)">System → User</span>
-              </span>
-            </div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Payments, state changes, vault ops. Cleared when resolved.</span></div>
-            <div class="tree-item"><span class="tree-line">·</span><span class="tree-note">Thread view enters focused mode</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="migrate-here">Migrates Here: Offers, alerts from Account</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Opens as focused overlay (header + tabs suppressed)</span></div>
           </div>
         </div>
         <div class="tree-group">
@@ -1891,8 +2233,8 @@
             Cart
           </div>
           <div class="tree-children">
-            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Persistent, cross-device</span></div>
-            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Commerce utility, not a pillar</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Persistent, cross-device commerce utility</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Opens as focused overlay (header + tabs suppressed)</span></div>
           </div>
         </div>
       </div>
@@ -1902,7 +2244,7 @@
       <h3><div class="dot" style="background:var(--accent)"></div>Primary Pillars</h3>
       <div class="tree">
         <div class="tree-group">
-          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('home')">Home <span class="tree-note" style="font-weight:400">— Orchestration</span></div>
+          <div class="tree-heading">Home <span class="tree-note" style="font-weight:400">— Orchestration</span></div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Priority tasks</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Portfolio highlights</span></div>
@@ -1912,7 +2254,7 @@
           </div>
         </div>
         <div class="tree-group">
-          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('shop')">Shop <span class="tree-note" style="font-weight:400">— Discovery & Commerce</span></div>
+          <div class="tree-heading">Shop <span class="tree-note" style="font-weight:400">— Discovery & Commerce</span></div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Shop Home (default landing)</span></div>
             <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Entry point grid + recommendation carousels</span></div>
@@ -1920,20 +2262,17 @@
             <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">"View All" → dedicated vertical surface</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Dedicated Verticals</span></div>
             <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Cards / Packs / Drops / Live</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Auctions destination (event cadence + My Bids)</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="migrate-here">Migrates Here: Bids into Shop → Auctions</span></div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Mode switch: Discover ↔ Saved</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Discover = browse; Saved = centralized revisit space</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Browse Filters (within each vertical)</span></div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Filter · Watchlist · Format · Category pills</span></div>
+            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Filter · Format · Category pills</span></div>
             <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Single scrollable row</span></div>
-            <div class="tree-item"><span class="tree-line">·</span>
-              <span class="tree-label" style="display:flex;align-items:center;gap:6px">
-                Watchlist
-                <span class="migration-badge to" style="font-size:9px">← Saved/Bids</span>
-              </span>
-            </div>
-            <div class="tree-item"><span class="tree-line"> </span><span class="tree-note">Inline filter for saved items & bid activity</span></div>
           </div>
         </div>
         <div class="tree-group">
-          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('search')">Search <span class="tree-note" style="font-weight:400">— Utility & Hubs</span></div>
+          <div class="tree-heading">Search <span class="tree-note" style="font-weight:400">— Utility & Hubs</span></div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Marketplace listings</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Entity hubs (players, teams, sets)</span></div>
@@ -1942,7 +2281,7 @@
           </div>
         </div>
         <div class="tree-group">
-          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('collection')">Collection <span class="tree-note" style="font-weight:400">— Ownership</span></div>
+          <div class="tree-heading">Collection <span class="tree-note" style="font-weight:400">— Ownership</span></div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">All Items</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Stacks (multi-membership)</span></div>
@@ -1954,19 +2293,14 @@
           </div>
         </div>
         <div class="tree-group">
-          <div class="tree-heading" style="cursor:pointer" onclick="switchTab('account')">Account <span class="tree-note" style="font-weight:400">— Operations</span></div>
+          <div class="tree-heading">Account <span class="tree-note" style="font-weight:400">— Operations</span></div>
           <div class="tree-children">
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Orders (commerce ledger)</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Selling (listing management)</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Vault Activity (operations log)</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Wallet (balances, payouts, FanCash)</span></div>
             <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Preferences / Help / Identity</span></div>
-            <div class="tree-item"><span class="tree-line"> </span>
-              <span class="tree-label" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <span class="migration-badge from" style="font-size:9px">Offers → Inbox</span>
-                <span class="migration-badge from" style="font-size:9px">Bids → Shop Watchlist</span>
-              </span>
-            </div>
+            <div class="tree-item"><span class="tree-line">·</span><span class="migrate-away">Migrates Away: Offers/alerts to Inbox, bids to Shop</span></div>
           </div>
         </div>
       </div>
@@ -1975,6 +2309,8 @@
     <div class="panel-block">
       <h3><div class="dot" style="background:var(--amber)"></div>Focused Modes (nav suppressed)</h3>
       <div class="tree">
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Cart overlay</span></div>
+        <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Inbox overlay</span></div>
         <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Messaging thread</span></div>
         <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Checkout (traditional)</span></div>
         <div class="tree-item"><span class="tree-line">·</span><span class="tree-label">Live stream</span></div>
@@ -1999,14 +2335,71 @@
     });
     document.getElementById('header-title').textContent = titles[name];
     document.getElementById('header-back').style.display = 'none';
-    if (name === 'shop') shopHome();
+    if (name === 'shop') setShopIntent('discover');
   }
 
-  const verticals = ['cards', 'packs', 'drops', 'live'];
+  const verticals = ['cards', 'packs', 'drops', 'live', 'auctions'];
+  let shopIntent = 'discover';
+  let auctionsMode = 'browse';
+  let auctionsEventFilter = 'all';
+  let bidsView = 'active';
+  let bidsAuctionFilter = 'all';
+  let bidsStatusFilter = 'all';
 
-  const verticalTitles = { cards: 'Cards', packs: 'Packs', drops: 'Drops', live: 'Live' };
+  const verticalTitles = { cards: 'Cards', packs: 'Packs', drops: 'Drops', live: 'Live', auctions: 'Auctions' };
+
+  function syncShopIntentToggle() {
+    const btns = document.querySelectorAll('#shop-intent-toggle .mode-btn');
+    if (btns.length >= 2) {
+      btns[0].classList.toggle('active', shopIntent === 'discover');
+      btns[1].classList.toggle('active', shopIntent === 'saved');
+    }
+  }
+
+  function setShopIntentControls(visible) {
+    const intentToggle = document.getElementById('shop-intent-toggle');
+    if (intentToggle) intentToggle.style.display = visible ? '' : 'none';
+  }
+
+  function setShopIntent(intent) {
+    shopIntent = intent === 'saved' ? 'saved' : 'discover';
+    syncShopIntentToggle();
+
+    const savedSurface = document.getElementById('shop-saved');
+    const discoverBanner = document.getElementById('shop-banner-discover');
+    const savedBanner = document.getElementById('shop-banner-saved');
+    if (shopIntent === 'saved') {
+      verticals.forEach(v => {
+        const el = document.getElementById('shop-' + v);
+        if (el) {
+          el.classList.remove('active');
+          el.style.display = 'none';
+        }
+      });
+      document.getElementById('shop-home').style.display = 'none';
+      if (savedSurface) savedSurface.style.display = '';
+      if (discoverBanner) discoverBanner.style.display = 'none';
+      if (savedBanner) savedBanner.style.display = '';
+      setShopIntentControls(true);
+      closeAllDropdowns();
+      document.getElementById('header-title').textContent = 'Saved';
+      document.getElementById('header-back').style.display = 'none';
+      return;
+    }
+
+    if (savedSurface) savedSurface.style.display = 'none';
+    if (discoverBanner) discoverBanner.style.display = '';
+    if (savedBanner) savedBanner.style.display = 'none';
+    setShopIntentControls(true);
+    shopHome();
+  }
 
   function shopVertical(name) {
+    shopIntent = 'discover';
+    syncShopIntentToggle();
+    const savedSurface = document.getElementById('shop-saved');
+    if (savedSurface) savedSurface.style.display = 'none';
+    setShopIntentControls(false);
     document.getElementById('shop-home').style.display = 'none';
     verticals.forEach(v => {
       const el = document.getElementById('shop-' + v);
@@ -2015,12 +2408,21 @@
         el.style.display = (v === name) ? 'block' : 'none';
       }
     });
+    if (name === 'auctions') {
+      setAuctionsMode('browse');
+      setAuctionsEventFilter(null, 'all');
+    }
     document.getElementById('header-title').textContent = verticalTitles[name] || 'Shop';
     document.getElementById('header-back').style.display = '';
     closeAllDropdowns();
   }
 
   function shopHome() {
+    shopIntent = 'discover';
+    syncShopIntentToggle();
+    const savedSurface = document.getElementById('shop-saved');
+    if (savedSurface) savedSurface.style.display = 'none';
+    setShopIntentControls(true);
     verticals.forEach(v => {
       const el = document.getElementById('shop-' + v);
       if (el) {
@@ -2037,6 +2439,47 @@
     const shopScreen = document.getElementById('screen-shop');
     if (shopScreen && shopScreen.classList.contains('active')) {
       shopHome();
+    }
+  }
+
+  function setAuctionsMode(mode) {
+    auctionsMode = mode === 'my-bids' ? 'my-bids' : 'browse';
+    const btns = document.querySelectorAll('#auctions-mode-toggle .mode-btn');
+    if (btns.length >= 2) {
+      btns[0].classList.toggle('active', auctionsMode === 'browse');
+      btns[1].classList.toggle('active', auctionsMode === 'my-bids');
+    }
+    const browseSurface = document.getElementById('auctions-browse');
+    const bidsSurface = document.getElementById('auctions-my-bids');
+    if (browseSurface) browseSurface.style.display = auctionsMode === 'browse' ? '' : 'none';
+    if (bidsSurface) bidsSurface.style.display = auctionsMode === 'my-bids' ? '' : 'none';
+    if (auctionsMode === 'my-bids') {
+      setBidsView('active');
+      setBidsAuctionFilter('all');
+      setBidsStatusFilter('all');
+    }
+  }
+
+  function setAuctionsEventFilter(el, filter) {
+    auctionsEventFilter = filter || 'all';
+    document.querySelectorAll('[data-auctions-event]').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.auctionsEvent === auctionsEventFilter);
+    });
+    const items = document.querySelectorAll('.auction-browse-item');
+    items.forEach(item => {
+      const inScope = auctionsEventFilter === 'all' || item.dataset.auction === auctionsEventFilter;
+      item.style.display = inScope ? '' : 'none';
+    });
+  }
+
+  function openAuctions(mode, eventFilter) {
+    switchTab('shop');
+    shopVertical('auctions');
+    if (mode === 'my-bids') {
+      setAuctionsMode('my-bids');
+    } else {
+      setAuctionsMode('browse');
+      setAuctionsEventFilter(null, eventFilter || 'all');
     }
   }
 
@@ -2080,6 +2523,21 @@
     });
   });
 
+  function initDocsAccordions() {
+    document.querySelectorAll('.panel-block .tree').forEach(tree => {
+      const groups = tree.querySelectorAll(':scope > .tree-group');
+      groups.forEach(group => {
+        group.classList.remove('open');
+        const heading = group.querySelector(':scope > .tree-heading');
+        if (!heading) return;
+        heading.addEventListener('click', function() {
+          group.classList.toggle('open');
+        });
+      });
+    });
+  }
+  initDocsAccordions();
+
   document.querySelectorAll('.shop-vertical').forEach(v => {
     v.style.display = v.classList.contains('active') ? '' : 'none';
   });
@@ -2090,14 +2548,134 @@
     closeOverlay();
     document.getElementById('overlay-' + name).classList.add('active');
     document.getElementById('icon-' + name).classList.add('active');
+    const phoneShell = document.getElementById('phone-shell');
+    if (phoneShell) phoneShell.classList.add('focus-overlay-active');
     activeOverlay = name;
   }
   function closeOverlay() {
     ['cart', 'inbox'].forEach(n => {
-      document.getElementById('overlay-' + n).classList.remove('active');
-      document.getElementById('icon-' + n).classList.remove('active');
+      const overlay = document.getElementById('overlay-' + n);
+      if (overlay) overlay.classList.remove('active');
+      const icon = document.getElementById('icon-' + n);
+      if (icon) icon.classList.remove('active');
     });
+    const phoneShell = document.getElementById('phone-shell');
+    if (phoneShell) phoneShell.classList.remove('focus-overlay-active');
     activeOverlay = null;
+  }
+
+  function setBidsView(view) {
+    bidsView = view === 'ended' ? 'ended' : 'active';
+    const btns = document.querySelectorAll('#bids-view-toggle .mode-btn');
+    if (btns.length >= 2) {
+      btns[0].classList.toggle('active', bidsView === 'active');
+      btns[1].classList.toggle('active', bidsView === 'ended');
+    }
+    syncBidsFilterControls();
+    applyBidsFilters();
+  }
+
+  function setBidsQuickFilter(el) {
+    document.querySelectorAll('[data-bid-quick-chip="true"]').forEach(chip => chip.classList.remove('active'));
+    if (el) el.classList.add('active');
+  }
+
+  function getValidBidsStatuses() {
+    return bidsView === 'active'
+      ? ['all', 'bid-needed', 'outbid', 'extended']
+      : ['all', 'won', 'lost'];
+  }
+
+  function syncBidsFilterControls() {
+    const quickSecondary = document.getElementById('bids-quick-secondary');
+    const quickTertiary = document.getElementById('bids-quick-tertiary');
+
+    if (quickSecondary && quickTertiary) {
+      if (bidsView === 'active') {
+        quickSecondary.textContent = 'Bid Needed';
+        quickSecondary.dataset.status = 'bid-needed';
+        quickTertiary.textContent = 'Outbid';
+        quickTertiary.dataset.status = 'outbid';
+      } else {
+        quickSecondary.textContent = 'Won';
+        quickSecondary.dataset.status = 'won';
+        quickTertiary.textContent = 'Lost';
+        quickTertiary.dataset.status = 'lost';
+      }
+    }
+
+    const validStatuses = getValidBidsStatuses();
+    document.querySelectorAll('#bids-status-dd [data-bids-status]').forEach(option => {
+      option.style.display = validStatuses.includes(option.dataset.bidsStatus) ? '' : 'none';
+    });
+
+    if (!validStatuses.includes(bidsStatusFilter)) {
+      bidsStatusFilter = 'all';
+      const labelEl = document.getElementById('bids-status-label');
+      if (labelEl) labelEl.textContent = 'All Status';
+      const allQuick = document.getElementById('bids-quick-all');
+      if (allQuick) setBidsQuickFilter(allQuick);
+    }
+  }
+
+  function setBidsQuickStatus(slot) {
+    const chipMap = {
+      all: document.getElementById('bids-quick-all'),
+      secondary: document.getElementById('bids-quick-secondary'),
+      tertiary: document.getElementById('bids-quick-tertiary')
+    };
+    const chip = chipMap[slot];
+    if (!chip) return;
+    setBidsQuickFilter(chip);
+    setBidsStatusFilter(chip.dataset.status || 'all');
+  }
+
+  function setBidsAuctionFilter(filter) {
+    bidsAuctionFilter = filter || 'all';
+    const auctionLabels = {
+      all: 'All Auctions',
+      'weekly-208': 'Weekly #208',
+      'premier-apr': 'April Premier',
+      'weekly-207': 'Weekly #207'
+    };
+    const labelEl = document.getElementById('bids-auction-label');
+    if (labelEl) labelEl.textContent = auctionLabels[bidsAuctionFilter] || 'All Auctions';
+    applyBidsFilters();
+    closeAllDropdowns();
+  }
+
+  function setBidsStatusFilter(filter) {
+    const validStatuses = getValidBidsStatuses();
+    bidsStatusFilter = validStatuses.includes(filter) ? filter : 'all';
+    const statusLabels = {
+      all: 'All Status',
+      'bid-needed': 'Bid Needed',
+      outbid: 'Outbid',
+      extended: 'Extended',
+      won: 'Won',
+      lost: 'Lost'
+    };
+    const labelEl = document.getElementById('bids-status-label');
+    if (labelEl) labelEl.textContent = statusLabels[bidsStatusFilter] || 'All Status';
+    const quickChip = Array.from(document.querySelectorAll('[data-bid-quick-chip="true"]')).find(
+      chip => chip.dataset.status === bidsStatusFilter
+    );
+    if (quickChip) setBidsQuickFilter(quickChip);
+    if (!quickChip && bidsStatusFilter !== 'all') {
+      document.querySelectorAll('[data-bid-quick-chip="true"]').forEach(chip => chip.classList.remove('active'));
+    }
+    applyBidsFilters();
+    closeAllDropdowns();
+  }
+
+  function applyBidsFilters() {
+    const items = document.querySelectorAll('#my-bids-list .bid-item');
+    items.forEach(item => {
+      const inView = bidsView === 'active' ? item.classList.contains('bid-active') : item.classList.contains('bid-ended');
+      const inAuction = bidsAuctionFilter === 'all' || item.dataset.auction === bidsAuctionFilter;
+      const inStatus = bidsStatusFilter === 'all' || item.dataset.status === bidsStatusFilter;
+      item.style.display = inView && inAuction && inStatus ? '' : 'none';
+    });
   }
 
   function inboxFilter(type) {
@@ -2114,6 +2692,19 @@
       }
     });
   }
+
+  let bannersEnabled = false;
+  function setBannerMode(enabled) {
+    bannersEnabled = enabled;
+    document.body.classList.toggle('show-banners', enabled);
+    const btns = document.querySelectorAll('#banner-toggle .mode-btn');
+    if (btns.length >= 2) {
+      btns[0].classList.toggle('active', !enabled);
+      btns[1].classList.toggle('active', enabled);
+    }
+  }
+
+  setBannerMode(false);
 </script>
 
 </body>
